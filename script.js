@@ -1,163 +1,90 @@
 let emojiList = ['🔵', '🟧', '🌀', '🍃'];
 let currentEmojiIndex = 0;
 
-let x, y;               // Center position of the bouncing emoji
-let vx, vy;             // Velocity of the emoji
-let emojiSize = 100;    // Enlarged emoji size (used for both drawing and collision detection)
-const cornerThreshold = 5; // Pixel threshold for detecting a corner hit
+let x, y;             // Center position of the bouncing emoji
+let vx, vy;           // Velocity
+let emojiSize = 150;  // Big emoji size for better visibility and higher chance of corner hits
 
-let tobyImage;          
-let scoreboardPositions = []; // Stores positions for scoreboard markers
-
-// Flags to avoid multiple triggers per collision
-let wallCollisionTriggered = false;
-let cornerCollisionTriggered = false;
-
-// Menu variables
-let menuVisible = false;
-let menuIconSize = 50;  // Size for the tiny Toby icon
-
-function preload() {
-  // Load the image that will be used as the scoreboard marker and for the menu icon
-  tobyImage = loadImage('toby1.png');
-}
+let cornerCounter = 0;  // Count of exact corner hits
+let cornerHitFlag = false;  // Prevent multiple counts for one collision
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   textAlign(CENTER, CENTER);
   textSize(emojiSize);
-  // Start the bouncing emoji at the center of the canvas
-  x = width / 2;
-  y = height / 2;
-  // Set initial velocities
+  // Start at the top-left corner (so you immediately register a hit)
+  x = emojiSize / 2;
+  y = emojiSize / 2;
+  // Set diagonal velocity
   vx = 5;
-  vy = 3;
+  vy = 5;
 }
 
 function draw() {
-  // Clear the canvas completely (no trailing effect)
+  // Clear background fully (no trailing effect)
   background(0);
+
+  // Draw the corner hit counter at the top center
+  fill(255);
+  textSize(32);
+  text("Corner Hits: " + cornerCounter, width / 2, 40);
   
-  // Draw all scoreboard markers (toby images) on the canvas
-  for (let pos of scoreboardPositions) {
-    image(tobyImage, pos.x, pos.y);
-  }
+  // Reset text size for the emoji
+  textSize(emojiSize);
   
-  // Draw the menu icon in the top-left corner (and the menu if visible)
-  drawMenuIcon();
-  if (menuVisible) {
-    drawMenu();
-  }
+  // Draw the bouncing emoji
+  fill(255);
+  text(emojiList[currentEmojiIndex], x, y);
   
-  // Update the emoji's position
+  // Update position
   x += vx;
   y += vy;
   
-  // --- Wall Collision Detection & Emoji Cycling ---
-  let collided = false;
-  
-  // Left wall
+  // --- Wall Collision & Emoji Cycling ---
+  // Check left wall
   if (x - emojiSize / 2 <= 0) {
-    vx = abs(vx);
-    collided = true;
+    x = emojiSize / 2;  // Force exact collision
+    vx = abs(vx);       // Bounce to the right
+    cycleEmoji();
   }
-  // Right wall
-  else if (x + emojiSize / 2 >= width) {
-    vx = -abs(vx);
-    collided = true;
+  // Check right wall
+  if (x + emojiSize / 2 >= width) {
+    x = width - emojiSize / 2;  // Force exact collision
+    vx = -abs(vx);              // Bounce to the left
+    cycleEmoji();
   }
-  // Top wall
+  // Check top wall
   if (y - emojiSize / 2 <= 0) {
-    vy = abs(vy);
-    collided = true;
+    y = emojiSize / 2;  // Force exact collision
+    vy = abs(vy);       // Bounce downward
+    cycleEmoji();
   }
-  // Bottom wall
-  else if (y + emojiSize / 2 >= height) {
-    vy = -abs(vy);
-    collided = true;
-  }
-  
-  // Cycle the emoji if a wall collision occurred (only once per collision)
-  if (collided && !wallCollisionTriggered) {
-    currentEmojiIndex = (currentEmojiIndex + 1) % emojiList.length;
-    wallCollisionTriggered = true;
-  }
-  if (!collided) {
-    wallCollisionTriggered = false;
+  // Check bottom wall
+  if (y + emojiSize / 2 >= height) {
+    y = height - emojiSize / 2; // Force exact collision
+    vy = -abs(vy);              // Bounce upward
+    cycleEmoji();
   }
   
-  // --- Corner Collision Detection & Scoreboard Marker ---
-  let hitCorner = false;
+  // --- Exact Corner Detection ---
+  // Determine if the emoji is exactly touching a corner:
+  let atLeft = (x - emojiSize / 2 === 0);
+  let atRight = (x + emojiSize / 2 === width);
+  let atTop = (y - emojiSize / 2 === 0);
+  let atBottom = (y + emojiSize / 2 === height);
   
-  // Check top-left corner
-  if (abs(x - emojiSize / 2) < cornerThreshold && abs(y - emojiSize / 2) < cornerThreshold) {
-    hitCorner = true;
-  }
-  // Check top-right corner
-  else if (abs(x + emojiSize / 2 - width) < cornerThreshold && abs(y - emojiSize / 2) < cornerThreshold) {
-    hitCorner = true;
-  }
-  // Check bottom-left corner
-  else if (abs(x - emojiSize / 2) < cornerThreshold && abs(y + emojiSize / 2 - height) < cornerThreshold) {
-    hitCorner = true;
-  }
-  // Check bottom-right corner
-  else if (abs(x + emojiSize / 2 - width) < cornerThreshold && abs(y + emojiSize / 2 - height) < cornerThreshold) {
-    hitCorner = true;
-  }
+  let isCorner = ( (atLeft && atTop) || (atLeft && atBottom) ||
+                   (atRight && atTop) || (atRight && atBottom) );
   
-  if (hitCorner && !cornerCollisionTriggered) {
-    // Place a toby1 image randomly on the canvas as a scoreboard marker
-    let randX = random(0, width - tobyImage.width);
-    let randY = random(0, height - tobyImage.height);
-    scoreboardPositions.push({ x: randX, y: randY });
-    cornerCollisionTriggered = true;
+  if (isCorner && !cornerHitFlag) {
+    cornerCounter++;
+    cornerHitFlag = true;
   }
-  if (!hitCorner) {
-    cornerCollisionTriggered = false;
+  if (!isCorner) {
+    cornerHitFlag = false;
   }
-  
-  // --- Draw the Bouncing Emoji ---
-  fill(255);
-  noStroke();
-  text(emojiList[currentEmojiIndex], x, y);
 }
 
-function drawMenuIcon() {
-  let iconX = 10;
-  let iconY = 10;
-  // Draw the tiny Toby icon for the menu
-  image(tobyImage, iconX, iconY, menuIconSize, menuIconSize);
-  stroke(255);
-  noFill();
-  rect(iconX, iconY, menuIconSize, menuIconSize);
-}
-
-function drawMenu() {
-  let menuX = 10;
-  let menuY = 70;
-  let menuW = 200;
-  let menuH = 100;
-  
-  // Draw a semi-transparent menu background
-  fill(50, 50, 50, 200);
-  noStroke();
-  rect(menuX, menuY, menuW, menuH, 5);
-  
-  // Display menu options (you can customize these options as needed)
-  fill(255);
-  textSize(16);
-  text("Load Archive:", menuX + menuW / 2, menuY + 25);
-  text("1. Old School VHS", menuX + menuW / 2, menuY + 50);
-  text("2. Original Script", menuX + menuW / 2, menuY + 75);
-}
-
-function mousePressed() {
-  // Toggle the menu when the menu icon is clicked
-  let iconX = 10;
-  let iconY = 10;
-  if (mouseX >= iconX && mouseX <= iconX + menuIconSize &&
-      mouseY >= iconY && mouseY <= iconY + menuIconSize) {
-    menuVisible = !menuVisible;
-  }
+function cycleEmoji() {
+  currentEmojiIndex = (currentEmojiIndex + 1) % emojiList.length;
 }
