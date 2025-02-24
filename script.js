@@ -1,20 +1,20 @@
 let emojiList = ['🔵', '🟧', '🌀', '🍃'];
 let currentEmojiIndex = 0;
 
-let x, y;           // Emoji position
-let vx, vy;         // Emoji velocity
+let x, y;           // Emoji (ball) center position
+let vx, vy;         // Emoji (ball) velocity
 let diameter = 50;  // Used for text size and collision detection
 
 let tobyImage;      
-let scoreboardPositions = []; // Stores positions where the scoreboard markers are placed
+let scoreboardPositions = []; // Array to store positions where toby1 is placed
 
-// Flags to prevent multiple triggers for the same event
-let cornerTriggered = false;   // For corner hits
-let collisionTriggered = false;  // For any wall collision
-const cornerThreshold = 2;       // Allowable error in pixels for detecting an exact corner
+// Flags to ensure single event trigger per collision
+let wallCollisionTriggered = false;
+let cornerCollisionTriggered = false;
+const cornerThreshold = 5; // Pixel threshold to detect a corner hit
 
 function preload() {
-  // Load the image for the scoreboard marker
+  // Load the image that will be used for scoreboard markers
   tobyImage = loadImage('toby1.png');
 }
 
@@ -22,19 +22,19 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   textAlign(CENTER, CENTER);
   textSize(diameter);
-  // Start in the center of the canvas
+  // Start the emoji at the center of the canvas
   x = width / 2;
   y = height / 2;
-  // Set initial velocities (adjust to control speed/direction)
+  // Set initial velocities
   vx = 5;
   vy = 3;
 }
 
 function draw() {
-  // Semi-transparent background creates a VHS-style trailing effect
+  // Create a VHS-style trailing effect with a semi-transparent background
   background(0, 20);
   
-  // Draw all scoreboard markers in the background
+  // Draw all scoreboard markers (toby1 images) in the background
   for (let pos of scoreboardPositions) {
     image(tobyImage, pos.x, pos.y);
   }
@@ -43,61 +43,71 @@ function draw() {
   x += vx;
   y += vy;
   
-  // Check for wall collisions and bounce the emoji:
-  let collided = false;
+  // --- Wall Collision Detection & Emoji Cycling ---
+  let collidedWall = false;
   
-  // Bounce off left/right walls
-  if (x + diameter/2 >= width || x - diameter/2 <= 0) {
-    vx *= -1;
-    collided = true;
+  // Check right wall
+  if (x + diameter/2 >= width) { 
+    vx = -abs(vx);
+    collidedWall = true;
   }
-  // Bounce off top/bottom walls
-  if (y + diameter/2 >= height || y - diameter/2 <= 0) {
-    vy *= -1;
-    collided = true;
+  // Check left wall
+  if (x - diameter/2 <= 0) {
+    vx = abs(vx);
+    collidedWall = true;
+  }
+  // Check bottom wall
+  if (y + diameter/2 >= height) {
+    vy = -abs(vy);
+    collidedWall = true;
+  }
+  // Check top wall
+  if (y - diameter/2 <= 0) {
+    vy = abs(vy);
+    collidedWall = true;
   }
   
-  // Cycle emoji on collision, but only once per hit:
-  if (collided && !collisionTriggered) {
+  // Cycle to the next emoji on any wall collision (only once per hit)
+  if (collidedWall && !wallCollisionTriggered) {
     currentEmojiIndex = (currentEmojiIndex + 1) % emojiList.length;
-    collisionTriggered = true;
+    wallCollisionTriggered = true;
   }
-  if (!collided) {
-    collisionTriggered = false;
+  if (!collidedWall) {
+    wallCollisionTriggered = false;
   }
   
-  // Check if the emoji touches any of the four exact corners:
+  // --- Corner Collision Detection & Scoreboard Marker ---
   let hitCorner = false;
   
   // Top-left corner
-  if (abs(x - diameter/2) <= cornerThreshold && abs(y - diameter/2) <= cornerThreshold) {
+  if (abs(x - diameter/2) < cornerThreshold && abs(y - diameter/2) < cornerThreshold) {
     hitCorner = true;
   }
   // Top-right corner
-  else if (abs(x + diameter/2 - width) <= cornerThreshold && abs(y - diameter/2) <= cornerThreshold) {
+  else if (abs(x + diameter/2 - width) < cornerThreshold && abs(y - diameter/2) < cornerThreshold) {
     hitCorner = true;
   }
   // Bottom-left corner
-  else if (abs(x - diameter/2) <= cornerThreshold && abs(y + diameter/2 - height) <= cornerThreshold) {
+  else if (abs(x - diameter/2) < cornerThreshold && abs(y + diameter/2 - height) < cornerThreshold) {
     hitCorner = true;
   }
   // Bottom-right corner
-  else if (abs(x + diameter/2 - width) <= cornerThreshold && abs(y + diameter/2 - height) <= cornerThreshold) {
+  else if (abs(x + diameter/2 - width) < cornerThreshold && abs(y + diameter/2 - height) < cornerThreshold) {
     hitCorner = true;
   }
   
-  if (hitCorner && !cornerTriggered) {
-    // Place the toby1 image randomly in the background
+  // When a corner hit is detected (and not already triggered), add a new marker
+  if (hitCorner && !cornerCollisionTriggered) {
     let randomX = random(0, width - tobyImage.width);
     let randomY = random(0, height - tobyImage.height);
     scoreboardPositions.push({ x: randomX, y: randomY });
-    cornerTriggered = true;
+    cornerCollisionTriggered = true;
   }
   if (!hitCorner) {
-    cornerTriggered = false;
+    cornerCollisionTriggered = false;
   }
   
-  // Draw the bouncing emoji
+  // --- Draw the bouncing emoji ---
   fill(255);
   noStroke();
   text(emojiList[currentEmojiIndex], x, y);
