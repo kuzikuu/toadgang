@@ -1,24 +1,24 @@
 let emojiList = ['🔵', '🟧', '🌀', '🍃'];
 let currentEmojiIndex = 0;
 
-let x, y;            // Center position of the bouncing emoji
-let vx, vy;          // Velocity of the emoji
-let emojiSize = 100; // Enlarged emoji size (also used for collision detection)
+let x, y;               // Center position of the bouncing emoji
+let vx, vy;             // Velocity of the emoji
+let emojiSize = 100;    // Enlarged emoji size (used for both drawing and collision detection)
+const cornerThreshold = 5; // Pixel threshold for detecting a corner hit
 
-let tobyImage;
-let scoreboardPositions = []; // Positions where toby1 images are placed
+let tobyImage;          
+let scoreboardPositions = []; // Stores positions for scoreboard markers
 
 // Flags to avoid multiple triggers per collision
 let wallCollisionTriggered = false;
 let cornerCollisionTriggered = false;
-const cornerThreshold = 5; // Pixel threshold for corner detection
 
 // Menu variables
 let menuVisible = false;
-let iconSize = 50; // Size for the tiny Toby icon
+let menuIconSize = 50;  // Size for the tiny Toby icon
 
 function preload() {
-  // Load the image for scoreboard markers and the menu icon
+  // Load the image that will be used as the scoreboard marker and for the menu icon
   tobyImage = loadImage('toby1.png');
 }
 
@@ -35,82 +35,82 @@ function setup() {
 }
 
 function draw() {
-  // Remove the trailing effect by fully clearing the canvas each frame
+  // Clear the canvas completely (no trailing effect)
   background(0);
   
-  // Draw the scoreboard markers (toby1 images) in the background
+  // Draw all scoreboard markers (toby images) on the canvas
   for (let pos of scoreboardPositions) {
     image(tobyImage, pos.x, pos.y);
   }
   
-  // Draw the menu Toby icon and the menu if toggled visible
-  drawIcon();
+  // Draw the menu icon in the top-left corner (and the menu if visible)
+  drawMenuIcon();
   if (menuVisible) {
     drawMenu();
   }
   
-  // Update emoji position
+  // Update the emoji's position
   x += vx;
   y += vy;
   
   // --- Wall Collision Detection & Emoji Cycling ---
-  let collidedWall = false;
+  let collided = false;
   
-  // Check right wall
-  if (x + emojiSize / 2 >= width) {
-    vx = -abs(vx);
-    collidedWall = true;
-  }
-  // Check left wall
+  // Left wall
   if (x - emojiSize / 2 <= 0) {
     vx = abs(vx);
-    collidedWall = true;
+    collided = true;
   }
-  // Check bottom wall
-  if (y + emojiSize / 2 >= height) {
-    vy = -abs(vy);
-    collidedWall = true;
+  // Right wall
+  else if (x + emojiSize / 2 >= width) {
+    vx = -abs(vx);
+    collided = true;
   }
-  // Check top wall
+  // Top wall
   if (y - emojiSize / 2 <= 0) {
     vy = abs(vy);
-    collidedWall = true;
+    collided = true;
+  }
+  // Bottom wall
+  else if (y + emojiSize / 2 >= height) {
+    vy = -abs(vy);
+    collided = true;
   }
   
-  // Cycle the emoji on any wall collision (only once per hit)
-  if (collidedWall && !wallCollisionTriggered) {
+  // Cycle the emoji if a wall collision occurred (only once per collision)
+  if (collided && !wallCollisionTriggered) {
     currentEmojiIndex = (currentEmojiIndex + 1) % emojiList.length;
     wallCollisionTriggered = true;
   }
-  if (!collidedWall) {
+  if (!collided) {
     wallCollisionTriggered = false;
   }
   
   // --- Corner Collision Detection & Scoreboard Marker ---
   let hitCorner = false;
   
-  // Top-left corner
+  // Check top-left corner
   if (abs(x - emojiSize / 2) < cornerThreshold && abs(y - emojiSize / 2) < cornerThreshold) {
     hitCorner = true;
   }
-  // Top-right corner
+  // Check top-right corner
   else if (abs(x + emojiSize / 2 - width) < cornerThreshold && abs(y - emojiSize / 2) < cornerThreshold) {
     hitCorner = true;
   }
-  // Bottom-left corner
+  // Check bottom-left corner
   else if (abs(x - emojiSize / 2) < cornerThreshold && abs(y + emojiSize / 2 - height) < cornerThreshold) {
     hitCorner = true;
   }
-  // Bottom-right corner
+  // Check bottom-right corner
   else if (abs(x + emojiSize / 2 - width) < cornerThreshold && abs(y + emojiSize / 2 - height) < cornerThreshold) {
     hitCorner = true;
   }
   
-  // If a corner is hit (and not already triggered), add a new scoreboard marker
   if (hitCorner && !cornerCollisionTriggered) {
-    let randomX = random(0, width - tobyImage.width);
-    let randomY = random(0, height - tobyImage.height);
-    scoreboardPositions.push({ x: randomX, y: randomY });
+    // Place a toby1 image randomly on the canvas as a scoreboard marker
+    let randX = random(0, width - tobyImage.width);
+    let randY = random(0, height - tobyImage.height);
+    scoreboardPositions.push({ x: randX, y: randY });
     cornerCollisionTriggered = true;
   }
   if (!hitCorner) {
@@ -123,41 +123,41 @@ function draw() {
   text(emojiList[currentEmojiIndex], x, y);
 }
 
-function drawIcon() {
+function drawMenuIcon() {
   let iconX = 10;
   let iconY = 10;
-  // Draw the tiny Toby icon in the top-left corner
-  image(tobyImage, iconX, iconY, iconSize, iconSize);
+  // Draw the tiny Toby icon for the menu
+  image(tobyImage, iconX, iconY, menuIconSize, menuIconSize);
   stroke(255);
   noFill();
-  rect(iconX, iconY, iconSize, iconSize);
+  rect(iconX, iconY, menuIconSize, menuIconSize);
 }
 
 function drawMenu() {
-  // Define menu dimensions and position
   let menuX = 10;
   let menuY = 70;
-  let menuWidth = 200;
-  let menuHeight = 100;
+  let menuW = 200;
+  let menuH = 100;
   
-  // Draw a semi-transparent background for the menu
+  // Draw a semi-transparent menu background
   fill(50, 50, 50, 200);
   noStroke();
-  rect(menuX, menuY, menuWidth, menuHeight, 5);
+  rect(menuX, menuY, menuW, menuH, 5);
   
-  // Display menu text options
+  // Display menu options (you can customize these options as needed)
   fill(255);
   textSize(16);
-  text("Load Archive:", menuX + menuWidth / 2, menuY + 25);
-  text("1. Old School VHS", menuX + menuWidth / 2, menuY + 50);
-  text("2. Original Script", menuX + menuWidth / 2, menuY + 75);
+  text("Load Archive:", menuX + menuW / 2, menuY + 25);
+  text("1. Old School VHS", menuX + menuW / 2, menuY + 50);
+  text("2. Original Script", menuX + menuW / 2, menuY + 75);
 }
 
 function mousePressed() {
-  // If the tiny Toby icon is clicked, toggle the menu
+  // Toggle the menu when the menu icon is clicked
   let iconX = 10;
   let iconY = 10;
-  if (mouseX >= iconX && mouseX <= iconX + iconSize && mouseY >= iconY && mouseY <= iconY + iconSize) {
+  if (mouseX >= iconX && mouseX <= iconX + menuIconSize &&
+      mouseY >= iconY && mouseY <= iconY + menuIconSize) {
     menuVisible = !menuVisible;
   }
 }
