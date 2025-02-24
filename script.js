@@ -1,90 +1,95 @@
 let emojiList = ['🔵', '🟧', '🌀', '🍃'];
 let currentEmojiIndex = 0;
 
-let x, y;             // Center position of the bouncing emoji
-let vx, vy;           // Velocity
-let emojiSize = 150;  // Big emoji size for better visibility and higher chance of corner hits
+let x, y;           // Ball (emoji) position
+let vx, vy;         // Ball velocity
+let diameter = 50;  // Used for text size and collision detection
 
-let cornerCounter = 0;  // Count of exact corner hits
-let cornerHitFlag = false;  // Prevent multiple counts for one collision
+let tobyImage;      
+let scoreboardPositions = []; // Array to store positions for scoreboard markers
+
+let cornerTriggered = false;  // Prevent multiple triggers for the same hit
+const cornerThreshold = 2;    // Allowable error in pixels for detecting an exact corner
+
+function preload() {
+  // Load the image that will be used as the scoreboard marker
+  tobyImage = loadImage('toby1.png');
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   textAlign(CENTER, CENTER);
-  textSize(emojiSize);
-  // Start at the top-left corner (so you immediately register a hit)
-  x = emojiSize / 2;
-  y = emojiSize / 2;
-  // Set diagonal velocity
+  textSize(diameter);
+  // Start the ball in the center of the canvas
+  x = width / 2;
+  y = height / 2;
+  // Initial velocities (adjust for speed/direction)
   vx = 5;
-  vy = 5;
+  vy = 3;
 }
 
 function draw() {
-  // Clear background fully (no trailing effect)
-  background(0);
-
-  // Draw the corner hit counter at the top center
-  fill(255);
-  textSize(32);
-  text("Corner Hits: " + cornerCounter, width / 2, 40);
+  // Create a VHS trail effect with a semi-transparent background
+  background(0, 20);
   
-  // Reset text size for the emoji
-  textSize(emojiSize);
+  // Draw all the scoreboard markers (toby1 images) in the background
+  for (let pos of scoreboardPositions) {
+    image(tobyImage, pos.x, pos.y);
+  }
   
-  // Draw the bouncing emoji
-  fill(255);
-  text(emojiList[currentEmojiIndex], x, y);
-  
-  // Update position
+  // Update ball position
   x += vx;
   y += vy;
   
-  // --- Wall Collision & Emoji Cycling ---
-  // Check left wall
-  if (x - emojiSize / 2 <= 0) {
-    x = emojiSize / 2;  // Force exact collision
-    vx = abs(vx);       // Bounce to the right
-    cycleEmoji();
+  // Bounce off the left/right walls
+  if (x + diameter/2 >= width || x - diameter/2 <= 0) {
+    vx *= -1;
   }
-  // Check right wall
-  if (x + emojiSize / 2 >= width) {
-    x = width - emojiSize / 2;  // Force exact collision
-    vx = -abs(vx);              // Bounce to the left
-    cycleEmoji();
-  }
-  // Check top wall
-  if (y - emojiSize / 2 <= 0) {
-    y = emojiSize / 2;  // Force exact collision
-    vy = abs(vy);       // Bounce downward
-    cycleEmoji();
-  }
-  // Check bottom wall
-  if (y + emojiSize / 2 >= height) {
-    y = height - emojiSize / 2; // Force exact collision
-    vy = -abs(vy);              // Bounce upward
-    cycleEmoji();
+  // Bounce off the top/bottom walls
+  if (y + diameter/2 >= height || y - diameter/2 <= 0) {
+    vy *= -1;
   }
   
-  // --- Exact Corner Detection ---
-  // Determine if the emoji is exactly touching a corner:
-  let atLeft = (x - emojiSize / 2 === 0);
-  let atRight = (x + emojiSize / 2 === width);
-  let atTop = (y - emojiSize / 2 === 0);
-  let atBottom = (y + emojiSize / 2 === height);
+  // Check if the ball is touching one of the four corners.
+  // We check the ball’s edge positions against the canvas edges.
+  let hitCorner = false;
   
-  let isCorner = ( (atLeft && atTop) || (atLeft && atBottom) ||
-                   (atRight && atTop) || (atRight && atBottom) );
+  // Top-left corner
+  if (abs(x - diameter/2) <= cornerThreshold && abs(y - diameter/2) <= cornerThreshold) {
+    hitCorner = true;
+  }
+  // Top-right corner
+  else if (abs(x + diameter/2 - width) <= cornerThreshold && abs(y - diameter/2) <= cornerThreshold) {
+    hitCorner = true;
+  }
+  // Bottom-left corner
+  else if (abs(x - diameter/2) <= cornerThreshold && abs(y + diameter/2 - height) <= cornerThreshold) {
+    hitCorner = true;
+  }
+  // Bottom-right corner
+  else if (abs(x + diameter/2 - width) <= cornerThreshold && abs(y + diameter/2 - height) <= cornerThreshold) {
+    hitCorner = true;
+  }
   
-  if (isCorner && !cornerHitFlag) {
-    cornerCounter++;
-    cornerHitFlag = true;
+  // If a corner hit is detected (and not already triggered for this hit)
+  if (hitCorner && !cornerTriggered) {
+    // Randomly determine where to place the toby1 image in the background
+    let randomX = random(0, width - tobyImage.width);
+    let randomY = random(0, height - tobyImage.height);
+    scoreboardPositions.push({ x: randomX, y: randomY });
+    cornerTriggered = true;
   }
-  if (!isCorner) {
-    cornerHitFlag = false;
+  
+  // Reset the corner trigger once the ball is no longer in a corner region
+  if (!hitCorner) {
+    cornerTriggered = false;
   }
-}
-
-function cycleEmoji() {
+  
+  // Draw the bouncing ball as an emoji
+  fill(255);
+  noStroke();
+  text(emojiList[currentEmojiIndex], x, y);
+  
+  // Cycle to the next emoji for a dynamic effect
   currentEmojiIndex = (currentEmojiIndex + 1) % emojiList.length;
 }
