@@ -1,10 +1,10 @@
-let currentScript = "Art2.js"; // Default to new script
+let currentScript = "Art2.js"; // Default active script
 let menuVisible = false;
-let menuIconSize = 50; // Menu button size
+let menuWidth = 250; // Width of the menu
 let tobyImage;
 
 function preload() {
-  tobyImage = loadImage('toby1.png'); // Menu button icon
+  tobyImage = loadImage("assets/toby1.png"); // Load Toby icon
 }
 
 function setup() {
@@ -15,60 +15,82 @@ function setup() {
 
 function draw() {
   background(0);
-  
-  // Draw menu icon and menu
-  drawMenuIcon();
-  if (menuVisible) {
-    drawMenu();
-  }
 
-  // Display active script text
+  // Draw slide-out menu
+  drawMenu();
+
+  // Display active script name
   fill(255);
   textSize(20);
   text("Active Script: " + currentScript, width / 2, height - 30);
 }
 
-function drawMenuIcon() {
-  let iconX = 10;
-  let iconY = 10;
-  image(tobyImage, iconX, iconY, menuIconSize, menuIconSize);
-}
-
+// 📜 **Slide-out Menu**
 function drawMenu() {
-  let menuX = 10;
-  let menuY = 70;
-  let menuW = 220;
-  let menuH = 130;
-  
-  fill(50, 50, 50, 200);
+  let menuX = menuVisible ? 0 : -menuWidth;
+
+  push();
+  fill(30, 30, 30, 220);
   noStroke();
-  rect(menuX, menuY, menuW, menuH, 10);
-  
+  rect(menuX, 0, menuWidth, height);
+
   fill(255);
+  textSize(18);
+  text("🎨 Switch Scripts", menuX + menuWidth / 2, 50);
   textSize(16);
-  text("Switch Scripts:", menuX + menuW / 2, menuY + 25);
-  text("1. Art1.js (Archive)", menuX + menuW / 2, menuY + 60);
-  text("2. Art2.js (Active)", menuX + menuW / 2, menuY + 90);
+  text("📁 Load Art1.js (Archive)", menuX + menuWidth / 2, 100);
+  text("🖌️ Load Art2.js (Main)", menuX + menuWidth / 2, 140);
+  text("🌌 Load Art3.js (Experimental)", menuX + menuWidth / 2, 180);
+  pop();
+
+  // Draw Toby icon as toggle button
+  drawMenuToggle(menuX);
 }
 
-function mousePressed() {
-  let iconX = 10;
-  let iconY = 10;
+// 📜 **Toby Icon Toggle Button**
+function drawMenuToggle(menuX) {
+  let toggleX = menuX + menuWidth;
+  image(tobyImage, toggleX, height / 2 - 25, 50, 50); // Toby icon
+}
 
-  // Toggle menu visibility if the menu icon is clicked
-  if (mouseX >= iconX && mouseX <= iconX + menuIconSize &&
-      mouseY >= iconY && mouseY <= iconY + menuIconSize) {
+// 📜 **Handle Clicks**
+function mousePressed() {
+  let toggleX = (menuVisible ? 0 : -menuWidth) + menuWidth;
+
+  // Toggle menu when clicking the Toby icon
+  if (mouseX >= toggleX && mouseX <= toggleX + 50 &&
+      mouseY >= height / 2 - 25 && mouseY <= height / 2 + 25) {
     menuVisible = !menuVisible;
     return;
   }
 
-  // Check if user selects an option
+  // Check if user selects a script
   if (menuVisible) {
-    if (mouseY > 60 && mouseY < 90) {
-      currentScript = "Art1.js"; // Load archived script
-    } else if (mouseY > 90 && mouseY < 120) {
-      currentScript = "Art2.js"; // Reload main script
+    if (mouseY > 80 && mouseY < 120) {
+      switchScript("Art1.js");
+    } else if (mouseY > 120 && mouseY < 160) {
+      switchScript("Art2.js");
+    } else if (mouseY > 160 && mouseY < 200) {
+      switchScript("Art3.js");
     }
     menuVisible = false;
+  }
+}
+
+// 📜 **Switch Scripts Dynamically**
+function switchScript(newScript) {
+  if (currentScript !== newScript) {
+    currentScript = newScript;
+
+    let oldScript = document.getElementById("dynamic-script");
+    if (oldScript) {
+      oldScript.remove();
+    }
+
+    let newScriptTag = document.createElement("script");
+    newScriptTag.id = "dynamic-script";
+    newScriptTag.src = newScript;
+    newScriptTag.defer = true;
+    document.body.appendChild(newScriptTag);
   }
 }
