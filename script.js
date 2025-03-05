@@ -1,7 +1,8 @@
-let currentScript = "Art2.js"; // Default active script
+let currentScript = "Art2.js"; // Default to Art2.js
 let menuVisible = false;
 let menuWidth = 250; // Width of the menu
 let tobyImage;
+let scriptLoaded = false; // Prevents multiple loads
 
 function preload() {
   tobyImage = loadImage("assets/toby1.png"); // Load Toby icon
@@ -11,12 +12,18 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   textAlign(CENTER, CENTER);
   textSize(16);
+
+  // Load default script only once
+  if (!scriptLoaded) {
+    loadScript(currentScript);
+    scriptLoaded = true;
+  }
 }
 
 function draw() {
   background(0);
 
-  // Draw slide-out menu
+  // Draw menu
   drawMenu();
 
   // Display active script name
@@ -77,7 +84,7 @@ function mousePressed() {
   }
 }
 
-// 📜 **Switch Scripts Dynamically**
+// 📜 **Switch Scripts Dynamically & Prevent Double Loads**
 function switchScript(newScript) {
   if (currentScript !== newScript) {
     currentScript = newScript;
@@ -87,10 +94,18 @@ function switchScript(newScript) {
       oldScript.remove();
     }
 
-    let newScriptTag = document.createElement("script");
-    newScriptTag.id = "dynamic-script";
-    newScriptTag.src = newScript;
-    newScriptTag.defer = true;
-    document.body.appendChild(newScriptTag);
+    loadScript(newScript);
   }
+}
+
+// 📜 **Load Script Dynamically**
+function loadScript(scriptName) {
+  let newScriptTag = document.createElement("script");
+  newScriptTag.id = "dynamic-script";
+  newScriptTag.src = scriptName;
+  newScriptTag.defer = true;
+  newScriptTag.onload = () => console.log(`Loaded ${scriptName}`);
+  newScriptTag.onerror = () => console.error(`Failed to load ${scriptName}`);
+  
+  document.body.appendChild(newScriptTag);
 }
