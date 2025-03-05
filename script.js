@@ -5,7 +5,7 @@ let tobyImage;
 let scriptLoaded = false; // Prevents multiple loads
 
 function preload() {
-  tobyImage = loadImage("assets/toby1.png"); // Load Toby icon
+  tobyImage = loadImage("toby1.png"); // Load Toby icon
 }
 
 function setup() {
