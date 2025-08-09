@@ -51,7 +51,7 @@ npm run deploy
 
 ## 📱 Live Demo
 
-Visit: toadgang.art[toadgang.art]
+Visit: [toadgang.art](https://toadgang.art)
 
 ---
 
