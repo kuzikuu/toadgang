@@ -10,11 +10,34 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Mobile viewport improvements */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 /* Ensure smooth animations */
 * {
   box-sizing: border-box;
+}
+
+/* Mobile touch improvements */
+@media (max-width: 640px) {
+  /* Prevent zoom on input focus on iOS */
+  input[type="text"] {
+    font-size: 16px;
+  }
+  
+  /* Better touch targets */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Improve scrolling on mobile */
+  .overflow-hidden {
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Custom scrollbar for the pond */
@@ -33,4 +56,28 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(147, 51, 234, 0.5);
+}
+
+/* Mobile-specific scrollbar */
+@media (max-width: 640px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+}
+
+/* Prevent text selection on mobile for better UX */
+@media (max-width: 640px) {
+  .select-none {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Mobile landscape optimizations */
+@media (max-width: 640px) and (orientation: landscape) {
+  .h-\[60vh\] {
+    height: 50vh;
+  }
 }

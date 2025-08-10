@@ -85,13 +85,14 @@ function useContainerSize() {
 
 function generateLayout(count, w, h, seed = 42) {
   const rand = mulberry32(seed);
-  const minSize = 88; // lily pad size in px
-  const maxSize = 148;
+  // Mobile-optimized sizes
+  const minSize = w < 640 ? 60 : w < 1024 ? 80 : 88; // Smaller on mobile
+  const maxSize = w < 640 ? 100 : w < 1024 ? 120 : 148;
   const items = [];
 
   for (let i = 0; i < count; i++) {
     const size = Math.floor(minSize + rand() * (maxSize - minSize));
-    const padding = 16;
+    const padding = w < 640 ? 8 : 16; // Smaller padding on mobile
     const x = Math.floor(rand() * Math.max(1, w - size - padding)) + padding / 2;
     const y = Math.floor(rand() * Math.max(1, h - size - padding)) + padding / 2;
 
@@ -132,38 +133,39 @@ export default function PurplePondSpheres() {
         <div className="absolute inset-0 bg-[rgba(12,0,24,0.45)]" />
       </div>
 
-      {/* Header */}
-      <header className="relative z-10 mx-auto max-w-6xl px-4 pt-8 pb-2">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight drop-shadow">
+      {/* Header - Mobile optimized */}
+      <header className="relative z-10 mx-auto max-w-6xl px-3 sm:px-4 pt-4 sm:pt-6 md:pt-8 pb-2">
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight drop-shadow leading-tight">
           Purple Pond: <span className="text-fuchsia-200">Toad Gang Zora Links</span>
         </h1>
-        <p className="mt-1 text-sm text-fuchsia-50/90 max-w-3xl drop-shadow">
+        <p className="mt-1 text-xs sm:text-sm text-fuchsia-50/90 max-w-3xl drop-shadow leading-relaxed">
           Click a lily pad to jump to a Zora profile.
         </p>
       </header>
 
-      {/* Controls */}
-      <div className="relative z-10 mx-auto max-w-6xl px-4 flex items-center gap-3">
+      {/* Controls - Mobile optimized layout */}
+      <div className="relative z-10 mx-auto max-w-6xl px-3 sm:px-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 opacity-80" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 opacity-80" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search handles…"
-            className="w-full rounded-2xl bg-black/30 backdrop-blur px-10 py-2 outline-none ring-1 ring-white/20 focus:ring-fuchsia-300/70 text-white placeholder-white/70"
+            className="w-full rounded-2xl bg-black/30 backdrop-blur px-10 py-3 sm:py-2 outline-none ring-1 ring-white/20 focus:ring-fuchsia-300/70 text-white placeholder-white/70 text-sm sm:text-base"
           />
         </div>
         <button
           onClick={() => setSeed(Math.floor(Math.random() * 100000))}
-          className="inline-flex items-center gap-2 rounded-2xl px-3 py-2 bg-fuchsia-600/90 hover:bg-fuchsia-500 transition shadow-lg shadow-fuchsia-900/40"
+          className="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 sm:px-3 sm:py-2 bg-fuchsia-600/90 hover:bg-fuchsia-500 active:bg-fuchsia-700 transition shadow-lg shadow-fuchsia-900/40 touch-manipulation"
         >
-          <Shuffle className="h-5 w-5" />
-          Shuffle
+          <Shuffle className="h-4 w-4 sm:h-5 sm:w-5" />
+          <span className="sm:hidden">Shuffle Layout</span>
+          <span className="hidden sm:inline">Shuffle</span>
         </button>
       </div>
 
-      {/* Pond play area */}
-      <main ref={wrapRef} className="relative z-0 mx-auto mt-4 mb-10 max-w-7xl h-[72vh] sm:h-[76vh] md:h-[78vh] lg:h-[80vh] rounded-3xl overflow-hidden border border-white/20 bg-black/10 backdrop-blur-[2px]">
+      {/* Pond play area - Mobile optimized heights */}
+      <main ref={wrapRef} className="relative z-0 mx-auto mt-3 sm:mt-4 mb-6 sm:mb-10 max-w-7xl h-[60vh] sm:h-[72vh] md:h-[76vh] lg:h-[78vh] xl:h-[80vh] rounded-2xl sm:rounded-3xl overflow-hidden border border-white/20 bg-black/10 backdrop-blur-[2px]">
         {/* Lily pads */}
         {filtered.map((item, i) => {
           const pos = layout[i] || { x: 0, y: 0, size: 120, drift: 8, float: 6, angle: 0 };
@@ -183,7 +185,7 @@ export default function PurplePondSpheres() {
               target="_blank"
               rel="noopener noreferrer"
               title={item.name}
-              className="group absolute select-none grid place-items-center text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300/80"
+              className="group absolute select-none grid place-items-center text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300/80 touch-manipulation"
               style={style}
             >
               <div className="relative w-full h-full">
@@ -193,8 +195,8 @@ export default function PurplePondSpheres() {
                   draggable={false}
                   className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.45)] transition-transform group-active:scale-95"
                 />
-                {/* Handle label */}
-                <span className="absolute left-1/2 -translate-x-1/2 bottom-1 translate-y-1/2 whitespace-nowrap text-[10px] sm:text-xs md:text-sm font-semibold bg-black/55 px-2 py-1 rounded-full ring-1 ring-white/20 backdrop-blur">
+                {/* Handle label - Mobile optimized */}
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-1 translate-y-1/2 whitespace-nowrap text-[8px] xs:text-[10px] sm:text-xs md:text-sm font-semibold bg-black/55 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ring-1 ring-white/20 backdrop-blur max-w-[90%] truncate">
                   🍃 {item.name}
                 </span>
               </div>
@@ -218,8 +220,8 @@ export default function PurplePondSpheres() {
 
         {/* Empty state */}
         {filtered.length === 0 && (
-          <div className="absolute inset-0 grid place-items-center text-center px-6">
-            <p className="text-fuchsia-50/90 drop-shadow">
+          <div className="absolute inset-0 grid place-items-center text-center px-4 sm:px-6">
+            <p className="text-sm sm:text-base text-fuchsia-50/90 drop-shadow">
               No pads match your search. Try another handle.
             </p>
           </div>
@@ -231,9 +233,9 @@ export default function PurplePondSpheres() {
         </div>
       </main>
 
-      {/* Footer blurb */}
-      <footer className="relative z-10 mx-auto max-w-6xl px-4 pb-8 text-xs text-fuchsia-50/90 drop-shadow">
-        <p>
+      {/* Footer blurb - Mobile optimized */}
+      <footer className="relative z-10 mx-auto max-w-6xl px-3 sm:px-4 pb-4 sm:pb-6 md:pb-8 text-xs sm:text-sm text-fuchsia-50/90 drop-shadow">
+        <p className="leading-relaxed">
           Arigato <a href="https://x.com/TopNoshFinance" className="underline decoration-fuchsia-300/70 hover:decoration-fuchsia-200" target="_blank" rel="noreferrer noopener">Topnoshfinance </a> for building the list. Built for <a href="https://github.com/kuzikuu/toadgang" className="underline decoration-fuchsia-300/70 hover:decoration-fuchsia-200" target="_blank" rel="noreferrer noopener">toadgang</a>. Study the lore <a href="https://toadgod.xyz" className="underline decoration-fuchsia-300/70 hover:decoration-fuchsia-200" target="_blank" rel="noreferrer noopener">toadgod.xyz</a>.
         </p>
       </footer>
