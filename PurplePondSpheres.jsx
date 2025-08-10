@@ -234,7 +234,7 @@ export default function PurplePondSpheres() {
       {/* Footer blurb */}
       <footer className="relative z-10 mx-auto max-w-6xl px-4 pb-8 text-xs text-fuchsia-50/90 drop-shadow">
         <p>
-          Built for <a href="https://github.com/kuzikuu/toadgang" className="underline decoration-fuchsia-300/70 hover:decoration-fuchsia-200" target="_blank" rel="noreferrer noopener">toadgang</a>. Study the lore [toadgod.xyz](toadgang.xyz).
+          Arigato <a href="https://x.com/TopNoshFinance" className="underline decoration-fuchsia-300/70 hover:decoration-fuchsia-200" target="_blank" rel="noreferrer noopener">Topnoshfinance </a> for building the list. Built for <a href="https://github.com/kuzikuu/toadgang" className="underline decoration-fuchsia-300/70 hover:decoration-fuchsia-200" target="_blank" rel="noreferrer noopener">toadgang</a>. Study the lore <a href="https://toadgod.xyz" className="underline decoration-fuchsia-300/70 hover:decoration-fuchsia-200" target="_blank" rel="noreferrer noopener">toadgod.xyz</a>.
         </p>
       </footer>
     </div>
