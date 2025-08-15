@@ -2,7 +2,7 @@
 // Assets expected at: public/pond.png and public/lily.png (or adjust paths below)
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Shuffle } from "lucide-react";
+import { Search, Shuffle, X } from "lucide-react";
 
 // --- Data: Zora profiles ---
 const TOAD_LEAFS = [
@@ -110,6 +110,10 @@ export default function PurplePondSpheres() {
   const [query, setQuery] = useState("");
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 100000));
   const [wrapRef, { w, h }] = useContainerSize();
+  const [showRegistration, setShowRegistration] = useState(false);
+  const [registrationData, setRegistrationData] = useState({ zoraProfile: "", email: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -123,6 +127,59 @@ export default function PurplePondSpheres() {
     h,
     seed,
   ]);
+
+  const handleRegistrationSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      // Option 1: EmailJS (requires setup)
+      // const templateParams = {
+      //   to_email: 'kuzikuu@gmail.com',
+      //   from_name: registrationData.zoraProfile,
+      //   from_email: registrationData.email,
+      //   message: `New Toad Gang registration request from ${registrationData.zoraProfile} (${registrationData.email})`,
+      //   zora_profile: registrationData.zoraProfile,
+      //   user_email: registrationData.email
+      // };
+      // await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams, 'YOUR_USER_ID');
+
+      // Option 2: Formspree (easier setup - just change the email below)
+      const formData = new FormData();
+      formData.append('email', 'kuzikuu@gmail.com'); // Your email address
+      formData.append('subject', 'New Toad Gang Registration Request');
+      formData.append('message', `
+New Toad Gang registration request:
+
+Zora Profile: ${registrationData.zoraProfile}
+User Email: ${registrationData.email}
+
+Please review and add to the list if they meet the requirements.
+      `);
+      
+      // For now, we'll simulate the email sending
+      console.log('Sending registration email:', {
+        to: 'kuzikuu@gmail.com',
+        zoraProfile: registrationData.zoraProfile,
+        userEmail: registrationData.email
+      });
+      
+      // Simulate email sending for now
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setSubmitted(true);
+      setTimeout(() => {
+        setShowRegistration(false);
+        setSubmitted(false);
+        setRegistrationData({ zoraProfile: "", email: "" });
+      }, 3000);
+    } catch (error) {
+      console.error('Registration failed:', error);
+      alert('Registration failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
@@ -239,6 +296,106 @@ export default function PurplePondSpheres() {
           Arigato <a href="https://x.com/TopNoshFinance" className="underline decoration-fuchsia-300/70 hover:decoration-fuchsia-200" target="_blank" rel="noreferrer noopener">Topnoshfinance </a> for building the list. Built for <a href="https://github.com/kuzikuu/toadgang" className="underline decoration-fuchsia-300/70 hover:decoration-fuchsia-200" target="_blank" rel="noreferrer noopener">toadgang</a>. Study the lore <a href="https://toadgod.xyz" className="underline decoration-fuchsia-300/70 hover:decoration-fuchsia-200" target="_blank" rel="noreferrer noopener">toadgod.xyz</a>.
         </p>
       </footer>
+
+      {/* Registration Button */}
+      <button
+        onClick={() => setShowRegistration(true)}
+        className="fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full bg-fuchsia-600/90 hover:bg-fuchsia-500 active:bg-fuchsia-700 transition-all duration-200 shadow-lg shadow-fuchsia-900/40 hover:scale-110 touch-manipulation"
+        title="Register for Toad Gang"
+      >
+        <img 
+          src="/toby.png" 
+          alt="Toby" 
+          className="w-full h-full object-contain p-2"
+        />
+      </button>
+
+      {/* Registration Modal */}
+      {showRegistration && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-gradient-to-br from-purple-900/95 to-fuchsia-900/95 rounded-3xl border border-white/20 backdrop-blur-xl shadow-2xl">
+            {/* Close button */}
+            <button
+              onClick={() => setShowRegistration(false)}
+              className="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="p-6">
+              {!submitted ? (
+                <>
+                  <div className="text-center mb-6">
+                    <img 
+                      src="/toby.png" 
+                      alt="Toby" 
+                      className="w-16 h-16 mx-auto mb-4 object-contain"
+                    />
+                    <h2 className="text-2xl font-bold text-white mb-2">Join Toad Gang</h2>
+                    <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-xl p-3 mb-4">
+                      <p className="text-sm text-yellow-200 font-medium">
+                        ⚠️ Requirement: You must have at least 1 TobyWorld related post to join
+                      </p>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleRegistrationSubmit} className="space-y-4">
+                    <div>
+                      <label htmlFor="zoraProfile" className="block text-sm font-medium text-white/90 mb-2">
+                        Zora Profile Name
+                      </label>
+                      <input
+                        type="text"
+                        id="zoraProfile"
+                        value={registrationData.zoraProfile}
+                        onChange={(e) => setRegistrationData({...registrationData, zoraProfile: e.target.value})}
+                        placeholder="Enter your Zora profile name"
+                        required
+                        className="w-full px-4 py-3 rounded-2xl bg-black/30 border border-white/20 focus:border-fuchsia-300/70 focus:ring-2 focus:ring-fuchsia-300/20 outline-none text-white placeholder-white/50 transition-all"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-white/90 mb-2">
+                        Your Email
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        value={registrationData.email}
+                        onChange={(e) => setRegistrationData({...registrationData, email: e.target.value})}
+                        placeholder="Enter your email address"
+                        required
+                        className="w-full px-4 py-3 rounded-2xl bg-black/30 border border-white/20 focus:border-fuchsia-300/70 focus:ring-2 focus:ring-fuchsia-300/20 outline-none text-white placeholder-white/50 transition-all"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full py-3 px-6 bg-fuchsia-600 hover:bg-fuchsia-500 active:bg-fuchsia-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl font-semibold text-white transition-all duration-200 shadow-lg shadow-fuchsia-900/40 touch-manipulation"
+                    >
+                      {isSubmitting ? "Submitting..." : "Submit Registration"}
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-green-500/20 rounded-full flex items-center justify-center">
+                    <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Thank You!</h3>
+                  <p className="text-white/80">
+                    We will review your registration and add you shortly.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

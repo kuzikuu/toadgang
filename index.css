@@ -21,6 +21,19 @@ body {
   box-sizing: border-box;
 }
 
+/* Background image optimizations */
+.background-pond {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+@media (min-width: 640px) {
+  .background-pond {
+    background-size: cover;
+  }
+}
+
 /* Mobile touch improvements */
 @media (max-width: 640px) {
   /* Prevent zoom on input focus on iOS */

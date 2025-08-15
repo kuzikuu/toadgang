@@ -2,24 +2,23 @@
 export default {
   content: [
     "./index.html",
-    "./**/*.{js,jsx}",
+    "./**/*.{js,jsx}"
   ],
   theme: {
     extend: {
       colors: {
-        fuchsia: {
-          100: '#fdf4ff',
-          300: '#c084fc',
-          400: '#a855f7',
-          500: '#a855f7',
-          600: '#9333ea',
-          900: '#581c87',
-        },
-        purple: {
-          950: '#2d1b69',
-        },
-        indigo: {
-          950: '#1e1b4b',
+        'fuchsia': {
+          50: '#fdf4ff',
+          100: '#fae8ff',
+          200: '#f5d0fe',
+          300: '#f0abfc',
+          400: '#e879f9',
+          500: '#d946ef',
+          600: '#c026d3',
+          700: '#a21caf',
+          800: '#86198f',
+          900: '#701a75',
+          950: '#4a044e',
         }
       }
     },
