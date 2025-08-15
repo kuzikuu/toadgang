@@ -60,6 +60,9 @@ const TOAD_LEAFS = [
   { name: "bleedndodgerblu", url: "https://zora.co/@bleedndodgerblu" },
   { name: "yellon982", url: "https://zora.co/@yellon982" },
   { name: "bull_sararu", url: "https://zora.co/@bull_sararu" },
+{ name: "christian", url: "https://zora.co/@clj38" },
+{ name: "johndabeast", url: "https://zora.co/@johndabeast" },
+{ name: "bloo", url: "https://zora.co/@bloo" },
 ];
 
 // Utility to get a seeded RNG so positions are repeatable per shuffle
