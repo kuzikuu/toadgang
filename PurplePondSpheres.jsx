@@ -137,46 +137,30 @@ export default function PurplePondSpheres() {
     setIsSubmitting(true);
     
     try {
-      // Option 1: EmailJS (requires setup)
-      // const templateParams = {
-      //   to_email: 'kuzikuu@gmail.com',
-      //   from_name: registrationData.zoraProfile,
-      //   from_email: registrationData.email,
-      //   message: `New Toad Gang registration request from ${registrationData.zoraProfile} (${registrationData.email})`,
-      //   zora_profile: registrationData.zoraProfile,
-      //   user_email: registrationData.email
-      // };
-      // await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams, 'YOUR_USER_ID');
-
-      // Option 2: Formspree (easier setup - just change the email below)
-      const formData = new FormData();
-      formData.append('email', 'kuzikuu@gmail.com'); // Your email address
-      formData.append('subject', 'New Toad Gang Registration Request');
-      formData.append('message', `
-New Toad Gang registration request:
-
-Zora Profile: ${registrationData.zoraProfile}
-User Email: ${registrationData.email}
-
-Please review and add to the list if they meet the requirements.
-      `);
-      
-      // For now, we'll simulate the email sending
-      console.log('Sending registration email:', {
-        to: 'kuzikuu@gmail.com',
-        zoraProfile: registrationData.zoraProfile,
-        userEmail: registrationData.email
+      const response = await fetch('https://formspree.io/f/xvgqyyay', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: 'kuzikuu@gmail.com', // Your email
+          subject: 'New Toad Gang Registration Request',
+          zoraProfile: registrationData.zoraProfile,
+          userEmail: registrationData.email,
+          message: `New Toad Gang registration request from ${registrationData.zoraProfile} (${registrationData.email})`
+        })
       });
-      
-      // Simulate email sending for now
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setSubmitted(true);
-      setTimeout(() => {
-        setShowRegistration(false);
-        setSubmitted(false);
-        setRegistrationData({ zoraProfile: "", email: "" });
-      }, 3000);
+
+      if (response.ok) {
+        setSubmitted(true);
+        setTimeout(() => {
+          setShowRegistration(false);
+          setSubmitted(false);
+          setRegistrationData({ zoraProfile: "", email: "" });
+        }, 3000);
+      } else {
+        throw new Error('Form submission failed');
+      }
     } catch (error) {
       console.error('Registration failed:', error);
       alert('Registration failed. Please try again.');
