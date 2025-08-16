@@ -21,6 +21,29 @@ body {
   box-sizing: border-box;
 }
 
+/* Prevent text flashing during animations */
+.lily-pad-text {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Smooth animation transitions */
+@keyframes drift {
+  0%, 100% { 
+    transform: translateZ(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateZ(0);
+  }
+}
+
 /* Background image optimizations */
 .background-pond {
   background-size: contain;

@@ -297,7 +297,7 @@ export default function PurplePondSpheres() {
                   className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.45)] transition-transform group-active:scale-95"
                 />
                 {/* Handle label - Mobile optimized */}
-                <span className="absolute left-1/2 -translate-x-1/2 bottom-1 translate-y-1/2 whitespace-nowrap text-[8px] xs:text-[10px] sm:text-xs md:text-sm font-semibold bg-black/55 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ring-1 ring-white/20 backdrop-blur max-w-[90%] truncate">
+                <span className="lily-pad-text absolute left-1/2 -translate-x-1/2 bottom-1 translate-y-1/2 whitespace-nowrap text-[8px] xs:text-[10px] sm:text-xs md:text-sm font-semibold bg-black/55 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ring-1 ring-white/20 backdrop-blur max-w-[90%] truncate">
                   🍃 {item.name}
                 </span>
               </div>
@@ -307,12 +307,12 @@ export default function PurplePondSpheres() {
 
               <style>{`
                 @keyframes drift-${i} {
-                  0%   { transform: translateX(0px) rotate(${pos.angle}deg); }
-                  100% { transform: translateX(${Math.round((pos.size/2) * (i % 2 === 0 ? 1 : -1))}px) rotate(${pos.angle + (i % 2 === 0 ? 4 : -4)}deg); }
+                  0%   { transform: translate3d(0px, 0px, 0px) rotate(${pos.angle}deg); }
+                  100% { transform: translate3d(${Math.round((pos.size/2) * (i % 2 === 0 ? 1 : -1))}px, 0px, 0px) rotate(${pos.angle + (i % 2 === 0 ? 4 : -4)}deg); }
                 }
                 @keyframes float-${i} {
-                  0%   { transform: translateY(0px); }
-                  100% { transform: translateY(${Math.round((pos.size/4) * (i % 3 === 0 ? 1 : -1))}px); }
+                  0%   { transform: translate3d(0px, 0px, 0px); }
+                  100% { transform: translate3d(0px, ${Math.round((pos.size/4) * (i % 3 === 0 ? 1 : -1))}px, 0px); }
                 }
               `}</style>
             </a>
