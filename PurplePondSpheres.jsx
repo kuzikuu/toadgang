@@ -123,6 +123,7 @@ export default function PurplePondSpheres() {
   const [registrationData, setRegistrationData] = useState({ zoraProfile: "", email: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   
   const { setFrameReady, isFrameReady, sdk } = useMiniKit();
 
@@ -133,12 +134,28 @@ export default function PurplePondSpheres() {
   // Call sdk.actions.ready() when the app is fully loaded
   useEffect(() => {
     if (sdk && sdk.actions) {
-      // Small delay to ensure all components are rendered
-      const timer = setTimeout(() => {
-        sdk.actions.ready();
-      }, 100);
+      // Preload the lily.png image to ensure it's ready
+      const lilyImage = new Image();
+      lilyImage.onload = () => {
+        setIsImageLoaded(true);
+        // Image is loaded, now call ready with a small delay for smooth transition
+        setTimeout(() => {
+          sdk.actions.ready();
+        }, 200);
+      };
+      lilyImage.onerror = () => {
+        // If image fails to load, still call ready after a delay
+        setTimeout(() => {
+          sdk.actions.ready();
+        }, 300);
+      };
+      lilyImage.src = '/lily.png';
       
-      return () => clearTimeout(timer);
+      return () => {
+        // Cleanup
+        lilyImage.onload = null;
+        lilyImage.onerror = null;
+      };
     }
   }, [sdk]);
 
@@ -191,6 +208,22 @@ export default function PurplePondSpheres() {
       setIsSubmitting(false);
     }
   };
+
+  // Show loading screen until image is loaded
+  if (!isImageLoaded && sdk) {
+    return (
+      <div className="fixed inset-0 bg-purple-950 flex items-center justify-center z-50">
+        <div className="text-center">
+          <img 
+            src="/lily.png" 
+            alt="Loading..." 
+            className="w-32 h-32 mx-auto mb-4 animate-pulse"
+          />
+          <div className="text-white text-lg">Loading Purple Pond...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
