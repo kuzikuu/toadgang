@@ -124,11 +124,23 @@ export default function PurplePondSpheres() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   
-  const { setFrameReady, isFrameReady } = useMiniKit();
+  const { setFrameReady, isFrameReady, sdk } = useMiniKit();
 
   useEffect(() => {
     if (!isFrameReady) setFrameReady();
   }, [isFrameReady, setFrameReady]);
+
+  // Call sdk.actions.ready() when the app is fully loaded
+  useEffect(() => {
+    if (sdk && sdk.actions) {
+      // Small delay to ensure all components are rendered
+      const timer = setTimeout(() => {
+        sdk.actions.ready();
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [sdk]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
