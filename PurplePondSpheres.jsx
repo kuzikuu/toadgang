@@ -134,28 +134,52 @@ export default function PurplePondSpheres() {
   // Call sdk.actions.ready() when the app is fully loaded
   useEffect(() => {
     if (sdk && sdk.actions) {
-      // Preload the lily.png image to ensure it's ready
+      // Always call ready after a short delay to ensure the app is initialized
+      const readyTimer = setTimeout(() => {
+        try {
+          if (sdk.actions && typeof sdk.actions.ready === 'function') {
+            sdk.actions.ready();
+            console.log('Base OnchainKit ready() called successfully');
+          } else {
+            console.warn('sdk.actions.ready is not available');
+          }
+        } catch (error) {
+          console.error('Error calling sdk.actions.ready():', error);
+        }
+      }, 500);
+
+      // Also try to preload the image for better UX
       const lilyImage = new Image();
       lilyImage.onload = () => {
         setIsImageLoaded(true);
-        // Image is loaded, now call ready with a small delay for smooth transition
-        setTimeout(() => {
-          sdk.actions.ready();
-        }, 200);
       };
       lilyImage.onerror = () => {
-        // If image fails to load, still call ready after a delay
-        setTimeout(() => {
-          sdk.actions.ready();
-        }, 300);
+        // If image fails to load, still mark as loaded to show the app
+        setIsImageLoaded(true);
       };
       lilyImage.src = '/lily.png';
       
       return () => {
-        // Cleanup
+        clearTimeout(readyTimer);
         lilyImage.onload = null;
         lilyImage.onerror = null;
       };
+    }
+  }, [sdk]);
+
+  // Additional fallback: ensure ready() is called even if the first attempt fails
+  useEffect(() => {
+    if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
+      const fallbackTimer = setTimeout(() => {
+        try {
+          sdk.actions.ready();
+          console.log('Base OnchainKit ready() called via fallback');
+        } catch (error) {
+          console.error('Fallback ready() call failed:', error);
+        }
+      }, 2000); // 2 second fallback
+
+      return () => clearTimeout(fallbackTimer);
     }
   }, [sdk]);
 
@@ -223,6 +247,11 @@ export default function PurplePondSpheres() {
         </div>
       </div>
     );
+  }
+
+  // Fallback: if SDK is not available, still show the app
+  if (!sdk) {
+    console.warn('MiniKit SDK not available, showing app without Base OnchainKit features');
   }
 
   return (
