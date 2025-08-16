@@ -124,8 +124,22 @@ export default function PurplePondSpheres() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
   const { setFrameReady, isFrameReady, sdk } = useMiniKit();
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+      setIsMobile(mobileRegex.test(userAgent));
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Initialize the frame - this is crucial for Farcaster Mini Apps
   useEffect(() => {
@@ -145,6 +159,52 @@ export default function PurplePondSpheres() {
       } catch (error) {
         console.error('Error calling sdk.actions.ready():', error);
       }
+    }
+  }, [sdk]);
+
+  // Mobile-specific fallback: ensure ready() is called even if the first attempt fails
+  useEffect(() => {
+    if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
+      // Mobile devices often need a small delay
+      const mobileTimer = setTimeout(() => {
+        try {
+          sdk.actions.ready();
+          console.log('Base OnchainKit ready() called via mobile fallback');
+        } catch (error) {
+          console.error('Mobile fallback ready() call failed:', error);
+        }
+      }, 100); // 100ms delay for mobile
+
+      // Additional fallback for stubborn mobile devices
+      const stubbornMobileTimer = setTimeout(() => {
+        try {
+          sdk.actions.ready();
+          console.log('Base OnchainKit ready() called via stubborn mobile fallback');
+        } catch (error) {
+          console.error('Stubborn mobile fallback ready() call failed:', error);
+        }
+      }, 500); // 500ms fallback for mobile
+
+      return () => {
+        clearTimeout(mobileTimer);
+        clearTimeout(stubbornMobileTimer);
+      };
+    }
+  }, [sdk]);
+
+  // Final fallback: ensure ready() is called after a reasonable time
+  useEffect(() => {
+    if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
+      const finalFallbackTimer = setTimeout(() => {
+        try {
+          sdk.actions.ready();
+          console.log('Base OnchainKit ready() called via final fallback');
+        } catch (error) {
+          console.error('Final fallback ready() call failed:', error);
+        }
+      }, 1000); // 1 second final fallback
+
+      return () => clearTimeout(finalFallbackTimer);
     }
   }, [sdk]);
 
@@ -227,14 +287,23 @@ export default function PurplePondSpheres() {
             className="w-32 h-32 mx-auto mb-4 animate-pulse"
           />
           <div className="text-white text-lg">Loading Purple Pond...</div>
+          {isMobile && (
+            <div className="text-sm text-fuchsia-300 mt-2">
+              Mobile device detected - optimizing...
+            </div>
+          )}
         </div>
       </div>
     );
   }
 
-  // Fallback: if SDK is not available, still show the app
+  // Fallback: if SDK is not available, still show the app (important for mobile)
   if (!sdk) {
     console.warn('MiniKit SDK not available, showing app without Base OnchainKit features');
+    // On mobile, we want to show the app even without SDK to avoid splash screen issues
+    if (isMobile) {
+      console.log('Mobile device detected - showing app without SDK to avoid splash screen issues');
+    }
   }
 
   return (
