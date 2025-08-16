@@ -127,11 +127,15 @@ export default function PurplePondSpheres() {
   
   const { setFrameReady, isFrameReady, sdk } = useMiniKit();
 
+  // Initialize the frame - this is crucial for Farcaster Mini Apps
   useEffect(() => {
-    if (!isFrameReady) setFrameReady();
+    if (!isFrameReady) {
+      setFrameReady();
+      console.log('Frame ready set');
+    }
   }, [isFrameReady, setFrameReady]);
 
-  // Call ready() as soon as the interface is ready - following Farcaster Mini Apps best practices
+  // Call ready() when the interface is ready - following Farcaster Mini Apps best practices
   useEffect(() => {
     if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
       // Call ready immediately when SDK is available and interface is ready

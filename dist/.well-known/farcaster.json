@@ -11,7 +11,7 @@
     "description": "Interactive lily pad interface for Toad Gang Zora community members",
     "screenshotUrls": [],
     "iconUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
-    "splashImageUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
+    "splashImageUrl": "https://kuzikuu.github.io/toadgang/lily.png",
     "splashBackgroundColor": "#581c87",
     "homeUrl": "https://kuzikuu.github.io/toadgang",
     "webhookUrl": "https://kuzikuu.github.io/toadgang/api/webhook",
