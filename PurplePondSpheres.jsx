@@ -131,57 +131,36 @@ export default function PurplePondSpheres() {
     if (!isFrameReady) setFrameReady();
   }, [isFrameReady, setFrameReady]);
 
-  // Call sdk.actions.ready() when the app is fully loaded
-  useEffect(() => {
-    if (sdk && sdk.actions) {
-      // Always call ready after a short delay to ensure the app is initialized
-      const readyTimer = setTimeout(() => {
-        try {
-          if (sdk.actions && typeof sdk.actions.ready === 'function') {
-            sdk.actions.ready();
-            console.log('Base OnchainKit ready() called successfully');
-          } else {
-            console.warn('sdk.actions.ready is not available');
-          }
-        } catch (error) {
-          console.error('Error calling sdk.actions.ready():', error);
-        }
-      }, 500);
-
-      // Also try to preload the image for better UX
-      const lilyImage = new Image();
-      lilyImage.onload = () => {
-        setIsImageLoaded(true);
-      };
-      lilyImage.onerror = () => {
-        // If image fails to load, still mark as loaded to show the app
-        setIsImageLoaded(true);
-      };
-      lilyImage.src = '/lily.png';
-      
-      return () => {
-        clearTimeout(readyTimer);
-        lilyImage.onload = null;
-        lilyImage.onerror = null;
-      };
-    }
-  }, [sdk]);
-
-  // Additional fallback: ensure ready() is called even if the first attempt fails
+  // Call ready() as soon as the interface is ready - following Farcaster Mini Apps best practices
   useEffect(() => {
     if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
-      const fallbackTimer = setTimeout(() => {
-        try {
-          sdk.actions.ready();
-          console.log('Base OnchainKit ready() called via fallback');
-        } catch (error) {
-          console.error('Fallback ready() call failed:', error);
-        }
-      }, 2000); // 2 second fallback
-
-      return () => clearTimeout(fallbackTimer);
+      // Call ready immediately when SDK is available and interface is ready
+      try {
+        sdk.actions.ready();
+        console.log('Base OnchainKit ready() called successfully - splash screen should hide');
+      } catch (error) {
+        console.error('Error calling sdk.actions.ready():', error);
+      }
     }
   }, [sdk]);
+
+  // Preload the splash image for better UX
+  useEffect(() => {
+    const lilyImage = new Image();
+    lilyImage.onload = () => {
+      setIsImageLoaded(true);
+    };
+    lilyImage.onerror = () => {
+      // If image fails to load, still mark as loaded to show the app
+      setIsImageLoaded(true);
+    };
+    lilyImage.src = '/lily.png';
+    
+    return () => {
+      lilyImage.onload = null;
+      lilyImage.onerror = null;
+    };
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
