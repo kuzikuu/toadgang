@@ -3,6 +3,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Search, Shuffle, X } from "lucide-react";
+import { useMiniKit } from '@coinbase/onchainkit/minikit';
 
 // --- Data: Zora profiles ---
 const TOAD_LEAFS = [
@@ -121,6 +122,12 @@ export default function PurplePondSpheres() {
   const [registrationData, setRegistrationData] = useState({ zoraProfile: "", email: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  
+  const { setFrameReady, isFrameReady } = useMiniKit();
+
+  useEffect(() => {
+    if (!isFrameReady) setFrameReady();
+  }, [isFrameReady, setFrameReady]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
