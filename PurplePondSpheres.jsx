@@ -126,7 +126,7 @@ export default function PurplePondSpheres() {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   
-  const { setFrameReady, isFrameReady, sdk } = useMiniKit();
+  const { setFrameReady, isFrameReady } = useMiniKit();
 
   // Detect mobile device
   useEffect(() => {
@@ -170,39 +170,30 @@ export default function PurplePondSpheres() {
     }
   }, [isFrameReady, setFrameReady]);
 
-  // Call ready() when the interface is ready - following Farcaster Mini Apps best practices
+  // Call ready() when the interface is ready - following Base MiniKit best practices
   useEffect(() => {
-    if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
-      // Call ready immediately when SDK is available and interface is ready
-      try {
-        sdk.actions.ready({ disableNativeGestures: true });
-        console.log('Base OnchainKit ready() called successfully - splash screen should hide');
-      } catch (error) {
-        console.error('Error calling sdk.actions.ready():', error);
-      }
+    if (!isFrameReady) {
+      setFrameReady();
+      console.log('Base MiniKit setFrameReady() called - splash screen should hide');
     }
-  }, [sdk]);
+  }, [setFrameReady, isFrameReady]);
 
-  // Mobile-specific fallback: ensure ready() is called even if the first attempt fails
+  // Mobile-specific fallback: ensure frame is ready even if the first attempt fails
   useEffect(() => {
-    if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
+    if (!isFrameReady) {
       // Mobile devices often need a small delay
       const mobileTimer = setTimeout(() => {
-        try {
-          sdk.actions.ready({ disableNativeGestures: true });
-          console.log('Base OnchainKit ready() called via mobile fallback');
-        } catch (error) {
-          console.error('Mobile fallback ready() call failed:', error);
+        if (!isFrameReady) {
+          setFrameReady();
+          console.log('Base MiniKit setFrameReady() called via mobile fallback');
         }
       }, 100); // 100ms delay for mobile
 
       // Additional fallback for stubborn mobile devices
       const stubbornMobileTimer = setTimeout(() => {
-        try {
-          sdk.actions.ready({ disableNativeGestures: true });
-          console.log('Base OnchainKit ready() called via stubborn mobile fallback');
-        } catch (error) {
-          console.error('Stubborn mobile fallback ready() call failed:', error);
+        if (!isFrameReady) {
+          setFrameReady();
+          console.log('Base MiniKit setFrameReady() called via stubborn mobile fallback');
         }
       }, 500); // 500ms fallback for mobile
 
@@ -211,46 +202,38 @@ export default function PurplePondSpheres() {
         clearTimeout(stubbornMobileTimer);
       };
     }
-  }, [sdk]);
+  }, [setFrameReady, isFrameReady]);
 
-  // Final fallback: ensure ready() is called after a reasonable time
+  // Final fallback: ensure frame is ready after a reasonable time
   useEffect(() => {
-    if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
+    if (!isFrameReady) {
       const finalFallbackTimer = setTimeout(() => {
-        try {
-          sdk.actions.ready({ disableNativeGestures: true });
-          console.log('Base OnchainKit ready() called via final fallback');
-        } catch (error) {
-          console.error('Final fallback ready() call failed:', error);
+        if (!isFrameReady) {
+          setFrameReady();
+          console.log('Base MiniKit setFrameReady() called via final fallback');
         }
       }, 1000); // 1 second final fallback
 
       return () => clearTimeout(finalFallbackTimer);
     }
-  }, [sdk]);
+  }, [setFrameReady, isFrameReady]);
 
-  // Mobile splash screen emergency override - force hide after 2 seconds
+  // Mobile splash screen emergency override - force ready after 2 seconds
   useEffect(() => {
-    if (isMobile && sdk) {
+    if (isMobile && !isFrameReady) {
       const emergencyTimer = setTimeout(() => {
-        try {
-          // Force multiple ready calls for mobile
-          if (sdk.actions && typeof sdk.actions.ready === 'function') {
-            sdk.actions.ready({ disableNativeGestures: true });
-            sdk.actions.ready({ disableNativeGestures: true }); // Call twice for mobile
-            console.log('Mobile emergency ready() calls made');
-          }
-          
-          // Force the app to be visible by updating state
-          setIsImageLoaded(true);
-        } catch (error) {
-          console.error('Mobile emergency override failed:', error);
+        if (!isFrameReady) {
+          setFrameReady();
+          console.log('Mobile emergency setFrameReady() call made');
         }
+        
+        // Force the app to be visible by updating state
+        setIsImageLoaded(true);
       }, 2000); // 2 second emergency override
 
       return () => clearTimeout(emergencyTimer);
     }
-  }, [isMobile, sdk]);
+  }, [isMobile, setFrameReady, isFrameReady]);
 
   // Nuclear option: completely bypass splash screen on mobile
   useEffect(() => {
@@ -361,7 +344,7 @@ export default function PurplePondSpheres() {
   };
 
   // Show loading screen until image is loaded
-  if (!isImageLoaded && sdk) {
+  if (!isImageLoaded && isFrameReady) {
     // On mobile, show app content immediately to bypass splash screen
     if (isMobile) {
       console.log('Mobile detected - bypassing loading screen to show app immediately');
@@ -446,7 +429,7 @@ export default function PurplePondSpheres() {
   }
 
   // Fallback: if SDK is not available, still show the app (important for mobile)
-  if (!sdk) {
+  if (!isFrameReady) {
     console.warn('MiniKit SDK not available, showing app without Base OnchainKit features');
     // On mobile, we want to show the app even without SDK to avoid splash screen issues
     if (isMobile) {
