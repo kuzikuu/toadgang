@@ -4,24 +4,16 @@
     "payload": "eyJkb21haW4iOiJrdXppa3V1LmdpdGh1Yi5pbyJ9",
     "signature": "MHg1MGJkNTFiMDNmZGRkMjFkYjYyNzdlNzI3YjRkNjNlN2JhMTkzOTdjMDE2NDE2MGQwNGQ0ZWQxZWE4Y2M0YmExMTM4ODY2YWY2Y2VjMGJiM2ZkNGQwMjZjMTRhZjNkNDNjOTg1ODE1ZjRiNmYwNDgyYmEwY2RmYzZjNWY0YTQxMTFj"
   },
-  "frame": {
-    "version": "1",
-    "name": "PurplePond",
-    "subtitle": "Toad Gang Zora Links",
+  "app": {
+    "name": "Purple Pond",
     "description": "Interactive lily pad interface for Toad Gang Zora community members",
-    "screenshotUrls": [],
-    "iconUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
-    "splashImageUrl": "https://kuzikuu.github.io/toadgang/lily.png",
-    "splashBackgroundColor": "#581c87",
-    "homeUrl": "https://kuzikuu.github.io/toadgang",
-    "webhookUrl": "https://kuzikuu.github.io/toadgang/api/webhook",
-    "primaryCategory": "social",
-    "tags": [],
-    "heroImageUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
-    "tagline": "Jump into the Purple Pond",
-    "ogTitle": "Purple Pond - Toad Gang",
-    "ogDescription": "Interactive lily pad interface for Toad Gang Zora community",
-    "ogImageUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
-    "noindex": true
+    "icon": "https://kuzikuu.github.io/toadgang/lily.png",
+    "splash": {
+      "image": "https://kuzikuu.github.io/toadgang/lily.png",
+      "backgroundColor": "#581c87"
+    },
+    "url": "https://kuzikuu.github.io/toadgang",
+    "category": "social",
+    "tags": ["zora", "toadgang", "community"]
   }
 }
