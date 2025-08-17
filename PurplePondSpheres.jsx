@@ -175,7 +175,7 @@ export default function PurplePondSpheres() {
     if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
       // Call ready immediately when SDK is available and interface is ready
       try {
-        sdk.actions.ready();
+        sdk.actions.ready({ disableNativeGestures: true });
         console.log('Base OnchainKit ready() called successfully - splash screen should hide');
       } catch (error) {
         console.error('Error calling sdk.actions.ready():', error);
@@ -189,7 +189,7 @@ export default function PurplePondSpheres() {
       // Mobile devices often need a small delay
       const mobileTimer = setTimeout(() => {
         try {
-          sdk.actions.ready();
+          sdk.actions.ready({ disableNativeGestures: true });
           console.log('Base OnchainKit ready() called via mobile fallback');
         } catch (error) {
           console.error('Mobile fallback ready() call failed:', error);
@@ -199,7 +199,7 @@ export default function PurplePondSpheres() {
       // Additional fallback for stubborn mobile devices
       const stubbornMobileTimer = setTimeout(() => {
         try {
-          sdk.actions.ready();
+          sdk.actions.ready({ disableNativeGestures: true });
           console.log('Base OnchainKit ready() called via stubborn mobile fallback');
         } catch (error) {
           console.error('Stubborn mobile fallback ready() call failed:', error);
@@ -218,7 +218,7 @@ export default function PurplePondSpheres() {
     if (sdk && sdk.actions && typeof sdk.actions.ready === 'function') {
       const finalFallbackTimer = setTimeout(() => {
         try {
-          sdk.actions.ready();
+          sdk.actions.ready({ disableNativeGestures: true });
           console.log('Base OnchainKit ready() called via final fallback');
         } catch (error) {
           console.error('Final fallback ready() call failed:', error);
@@ -236,8 +236,8 @@ export default function PurplePondSpheres() {
         try {
           // Force multiple ready calls for mobile
           if (sdk.actions && typeof sdk.actions.ready === 'function') {
-            sdk.actions.ready();
-            sdk.actions.ready(); // Call twice for mobile
+            sdk.actions.ready({ disableNativeGestures: true });
+            sdk.actions.ready({ disableNativeGestures: true }); // Call twice for mobile
             console.log('Mobile emergency ready() calls made');
           }
           
