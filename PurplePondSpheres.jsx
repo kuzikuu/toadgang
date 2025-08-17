@@ -142,21 +142,11 @@ export default function PurplePondSpheres() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Initialize the frame - this is crucial for Farcaster Mini Apps
+  // Initialize the frame - following Base documentation exactly
   useEffect(() => {
-    // Call setFrameReady immediately to dismiss splash screen
-    setFrameReady();
-    console.log('Base MiniKit setFrameReady() called immediately');
-    
-    // Fallback: ensure frame is ready after a short delay
-    const fallbackTimer = setTimeout(() => {
-      if (!isFrameReady) {
-        setFrameReady();
-        console.log('Base MiniKit setFrameReady() called via fallback');
-      }
-    }, 500);
-
-    return () => clearTimeout(fallbackTimer);
+    if (!isFrameReady) {
+      setFrameReady();
+    }
   }, [setFrameReady, isFrameReady]);
 
 
