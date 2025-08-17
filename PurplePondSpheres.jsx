@@ -208,6 +208,29 @@ export default function PurplePondSpheres() {
     }
   }, [sdk]);
 
+  // Mobile splash screen emergency override - force hide after 2 seconds
+  useEffect(() => {
+    if (isMobile && sdk) {
+      const emergencyTimer = setTimeout(() => {
+        try {
+          // Force multiple ready calls for mobile
+          if (sdk.actions && typeof sdk.actions.ready === 'function') {
+            sdk.actions.ready();
+            sdk.actions.ready(); // Call twice for mobile
+            console.log('Mobile emergency ready() calls made');
+          }
+          
+          // Force the app to be visible by updating state
+          setIsImageLoaded(true);
+        } catch (error) {
+          console.error('Mobile emergency override failed:', error);
+        }
+      }, 2000); // 2 second emergency override
+
+      return () => clearTimeout(emergencyTimer);
+    }
+  }, [isMobile, sdk]);
+
   // Preload the splash image for better UX
   useEffect(() => {
     const lilyImage = new Image();
@@ -288,11 +311,26 @@ export default function PurplePondSpheres() {
           />
           <div className="text-white text-lg">Loading Purple Pond...</div>
           {isMobile && (
-            <div className="text-sm text-fuchsia-300 mt-2">
-              Mobile device detected - optimizing...
-            </div>
+            <>
+              <div className="text-sm text-fuchsia-300 mt-2">
+                Mobile device detected - optimizing...
+              </div>
+              <div className="text-xs text-fuchsia-400 mt-1">
+                If splash screen persists, tap anywhere to continue
+              </div>
+            </>
           )}
         </div>
+        
+        {/* Mobile emergency continue button */}
+        {isMobile && (
+          <button
+            onClick={() => setIsImageLoaded(true)}
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-fuchsia-600 hover:bg-fuchsia-500 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            Continue to App
+          </button>
+        )}
       </div>
     );
   }
@@ -308,6 +346,23 @@ export default function PurplePondSpheres() {
 
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
+      {/* Force visibility on mobile - emergency override for splash screen issues */}
+      {isMobile && (
+        <style>{`
+          /* Force hide any Farcaster splash screen overlays on mobile */
+          body > *:not(#root) {
+            display: none !important;
+          }
+          /* Ensure our app is always visible */
+          #root {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            z-index: 9999 !important;
+          }
+        `}</style>
+      )}
+      
       {/* Background pond photo */}
       <div className="absolute inset-0 -z-10">
         <img src="/pond.png" alt="Purple pond background" className="w-full h-full object-cover" />
