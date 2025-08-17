@@ -138,6 +138,27 @@ export default function PurplePondSpheres() {
     
     checkMobile();
     window.addEventListener('resize', checkMobile);
+    
+    // Immediately inject CSS override for mobile
+    if (checkMobile()) {
+      const mobileStyle = document.createElement('style');
+      mobileStyle.textContent = `
+        /* Immediate mobile splash screen bypass */
+        @media (max-width: 768px) {
+          body > *:not(#root) {
+            display: none !important;
+          }
+          #root {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            z-index: 999999 !important;
+          }
+        }
+      `;
+      document.head.appendChild(mobileStyle);
+    }
+    
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -231,6 +252,46 @@ export default function PurplePondSpheres() {
     }
   }, [isMobile, sdk]);
 
+  // Nuclear option: completely bypass splash screen on mobile
+  useEffect(() => {
+    if (isMobile) {
+      // Force show app immediately on mobile, ignore all splash screen logic
+      const nuclearTimer = setTimeout(() => {
+        setIsImageLoaded(true);
+        console.log('Nuclear option: forcing app visibility on mobile');
+        
+        // Inject aggressive CSS to override Farcaster
+        const style = document.createElement('style');
+        style.textContent = `
+          /* Nuclear CSS override for mobile Farcaster */
+          * {
+            visibility: visible !important;
+            opacity: 1 !important;
+          }
+          body > *:not(#root) {
+            display: none !important;
+          }
+          #root {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            z-index: 999999 !important;
+            position: relative !important;
+          }
+          /* Hide any Farcaster splash screen elements */
+          [data-testid*="splash"], [class*="splash"], [id*="splash"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+          }
+        `;
+        document.head.appendChild(style);
+      }, 500); // 500ms nuclear option
+
+      return () => clearTimeout(nuclearTimer);
+    }
+  }, [isMobile]);
+
   // Preload the splash image for better UX
   useEffect(() => {
     const lilyImage = new Image();
@@ -301,6 +362,55 @@ export default function PurplePondSpheres() {
 
   // Show loading screen until image is loaded
   if (!isImageLoaded && sdk) {
+    // On mobile, show app content immediately to bypass splash screen
+    if (isMobile) {
+      console.log('Mobile detected - bypassing loading screen to show app immediately');
+      return (
+        <div className="relative min-h-screen text-white overflow-hidden">
+          {/* Force visibility on mobile - emergency override for splash screen issues */}
+          <style>{`
+            /* Force hide any Farcaster splash screen overlays on mobile */
+            body > *:not(#root) {
+              display: none !important;
+            }
+            /* Ensure our app is always visible */
+            #root {
+              display: block !important;
+              visibility: visible !important;
+              opacity: 1 !important;
+              z-index: 9999 !important;
+            }
+          `}</style>
+          
+          {/* Background pond photo */}
+          <div className="absolute inset-0 -z-10">
+            <img src="/pond.png" alt="Purple pond background" className="w-full h-full object-cover" />
+            {/* subtle darkening for contrast */}
+            <div className="absolute inset-0 bg-[rgba(12,0,24,0.45)]" />
+          </div>
+
+          {/* Header - Mobile optimized */}
+          <header className="relative z-10 mx-auto max-w-6xl px-3 sm:px-4 pt-4 sm:pt-6 md:pt-8 pb-2">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight drop-shadow leading-tight">
+              Purple Pond: <span className="text-fuchsia-200">Toad Gang Zora Links</span>
+            </h1>
+            <p className="mt-1 text-xs sm:text-sm text-fuchsia-50/90 max-w-3xl drop-shadow leading-relaxed">
+              Click a lily pad to jump to a Zora profile.
+            </p>
+          </header>
+
+          {/* Show a simple message that the app is loading */}
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <div className="text-center">
+              <div className="text-fuchsia-300 text-lg mb-4">Loading Purple Pond...</div>
+              <div className="text-fuchsia-400 text-sm">Mobile app loading...</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Desktop loading screen (unchanged)
     return (
       <div className="fixed inset-0 bg-purple-950 flex items-center justify-center z-50">
         <div className="text-center">
