@@ -139,141 +139,29 @@ export default function PurplePondSpheres() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
-    // Immediately inject CSS override for mobile
-    if (checkMobile()) {
-      const mobileStyle = document.createElement('style');
-      mobileStyle.textContent = `
-        /* Immediate mobile splash screen bypass */
-        @media (max-width: 768px) {
-          body > *:not(#root) {
-            display: none !important;
-          }
-          #root {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            z-index: 999999 !important;
-          }
-        }
-      `;
-      document.head.appendChild(mobileStyle);
-    }
-    
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Initialize the frame - this is crucial for Farcaster Mini Apps
   useEffect(() => {
-    if (!isFrameReady) {
-      setFrameReady();
-      console.log('Frame ready set');
-    }
-  }, [isFrameReady, setFrameReady]);
+    // Call setFrameReady immediately to dismiss splash screen
+    setFrameReady();
+    console.log('Base MiniKit setFrameReady() called immediately');
+    
+    // Fallback: ensure frame is ready after a short delay
+    const fallbackTimer = setTimeout(() => {
+      if (!isFrameReady) {
+        setFrameReady();
+        console.log('Base MiniKit setFrameReady() called via fallback');
+      }
+    }, 500);
 
-  // Call ready() when the interface is ready - following Base MiniKit best practices
-  useEffect(() => {
-    if (!isFrameReady) {
-      setFrameReady();
-      console.log('Base MiniKit setFrameReady() called - splash screen should hide');
-    }
+    return () => clearTimeout(fallbackTimer);
   }, [setFrameReady, isFrameReady]);
 
-  // Mobile-specific fallback: ensure frame is ready even if the first attempt fails
-  useEffect(() => {
-    if (!isFrameReady) {
-      // Mobile devices often need a small delay
-      const mobileTimer = setTimeout(() => {
-        if (!isFrameReady) {
-          setFrameReady();
-          console.log('Base MiniKit setFrameReady() called via mobile fallback');
-        }
-      }, 100); // 100ms delay for mobile
 
-      // Additional fallback for stubborn mobile devices
-      const stubbornMobileTimer = setTimeout(() => {
-        if (!isFrameReady) {
-          setFrameReady();
-          console.log('Base MiniKit setFrameReady() called via stubborn mobile fallback');
-        }
-      }, 500); // 500ms fallback for mobile
 
-      return () => {
-        clearTimeout(mobileTimer);
-        clearTimeout(stubbornMobileTimer);
-      };
-    }
-  }, [setFrameReady, isFrameReady]);
 
-  // Final fallback: ensure frame is ready after a reasonable time
-  useEffect(() => {
-    if (!isFrameReady) {
-      const finalFallbackTimer = setTimeout(() => {
-        if (!isFrameReady) {
-          setFrameReady();
-          console.log('Base MiniKit setFrameReady() called via final fallback');
-        }
-      }, 1000); // 1 second final fallback
-
-      return () => clearTimeout(finalFallbackTimer);
-    }
-  }, [setFrameReady, isFrameReady]);
-
-  // Mobile splash screen emergency override - force ready after 2 seconds
-  useEffect(() => {
-    if (isMobile && !isFrameReady) {
-      const emergencyTimer = setTimeout(() => {
-        if (!isFrameReady) {
-          setFrameReady();
-          console.log('Mobile emergency setFrameReady() call made');
-        }
-        
-        // Force the app to be visible by updating state
-        setIsImageLoaded(true);
-      }, 2000); // 2 second emergency override
-
-      return () => clearTimeout(emergencyTimer);
-    }
-  }, [isMobile, setFrameReady, isFrameReady]);
-
-  // Nuclear option: completely bypass splash screen on mobile
-  useEffect(() => {
-    if (isMobile) {
-      // Force show app immediately on mobile, ignore all splash screen logic
-      const nuclearTimer = setTimeout(() => {
-        setIsImageLoaded(true);
-        console.log('Nuclear option: forcing app visibility on mobile');
-        
-        // Inject aggressive CSS to override Farcaster
-        const style = document.createElement('style');
-        style.textContent = `
-          /* Nuclear CSS override for mobile Farcaster */
-          * {
-            visibility: visible !important;
-            opacity: 1 !important;
-          }
-          body > *:not(#root) {
-            display: none !important;
-          }
-          #root {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            z-index: 999999 !important;
-            position: relative !important;
-          }
-          /* Hide any Farcaster splash screen elements */
-          [data-testid*="splash"], [class*="splash"], [id*="splash"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-          }
-        `;
-        document.head.appendChild(style);
-      }, 500); // 500ms nuclear option
-
-      return () => clearTimeout(nuclearTimer);
-    }
-  }, [isMobile]);
 
   // Preload the splash image for better UX
   useEffect(() => {
@@ -287,9 +175,15 @@ export default function PurplePondSpheres() {
     };
     lilyImage.src = '/lily.png';
     
+    // Auto-hide loading screen after 1 second for better UX
+    const autoHideTimer = setTimeout(() => {
+      setIsImageLoaded(true);
+    }, 1000);
+    
     return () => {
       lilyImage.onload = null;
       lilyImage.onerror = null;
+      clearTimeout(autoHideTimer);
     };
   }, []);
 
@@ -343,27 +237,13 @@ export default function PurplePondSpheres() {
     }
   };
 
-  // Show loading screen until image is loaded
-  if (!isImageLoaded && isFrameReady) {
+  // Show loading screen only briefly - prioritize showing the app for Farcaster
+  if (!isImageLoaded) {
     // On mobile, show app content immediately to bypass splash screen
     if (isMobile) {
       console.log('Mobile detected - bypassing loading screen to show app immediately');
       return (
         <div className="relative min-h-screen text-white overflow-hidden">
-          {/* Force visibility on mobile - emergency override for splash screen issues */}
-          <style>{`
-            /* Force hide any Farcaster splash screen overlays on mobile */
-            body > *:not(#root) {
-              display: none !important;
-            }
-            /* Ensure our app is always visible */
-            #root {
-              display: block !important;
-              visibility: visible !important;
-              opacity: 1 !important;
-              z-index: 9999 !important;
-            }
-          `}</style>
           
           {/* Background pond photo */}
           <div className="absolute inset-0 -z-10">
@@ -419,7 +299,7 @@ export default function PurplePondSpheres() {
         {isMobile && (
           <button
             onClick={() => setIsImageLoaded(true)}
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-fuchsia-600 hover:bg-fuchsia-500 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-fuchsia-600 hover:bg-fuchsia-500 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
             Continue to App
           </button>
@@ -428,33 +308,10 @@ export default function PurplePondSpheres() {
     );
   }
 
-  // Fallback: if SDK is not available, still show the app (important for mobile)
-  if (!isFrameReady) {
-    console.warn('MiniKit SDK not available, showing app without Base OnchainKit features');
-    // On mobile, we want to show the app even without SDK to avoid splash screen issues
-    if (isMobile) {
-      console.log('Mobile device detected - showing app without SDK to avoid splash screen issues');
-    }
-  }
+
 
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
-      {/* Force visibility on mobile - emergency override for splash screen issues */}
-      {isMobile && (
-        <style>{`
-          /* Force hide any Farcaster splash screen overlays on mobile */
-          body > *:not(#root) {
-            display: none !important;
-          }
-          /* Ensure our app is always visible */
-          #root {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            z-index: 9999 !important;
-          }
-        `}</style>
-      )}
       
       {/* Background pond photo */}
       <div className="absolute inset-0 -z-10">
