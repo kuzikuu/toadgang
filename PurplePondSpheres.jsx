@@ -84,7 +84,6 @@ function useContainerSize() {
     if (!ref.current) return;
     const ro = new ResizeObserver((entries) => {
       const { width, height } = entries[0].contentRect;
-      console.log('Container size changed:', { width, height });
       setSize({ w: width, h: height });
     });
     ro.observe(ref.current);
@@ -96,30 +95,39 @@ function useContainerSize() {
 function generateLayout(count, w, h, seed = 42) {
   const rand = mulberry32(seed);
   
-  // Debug logging
-  console.log('generateLayout called with:', { count, w, h, seed });
-  
   // Ensure we have valid dimensions
   if (w <= 0 || h <= 0) {
-    console.warn('Invalid container dimensions:', { w, h });
     return [];
   }
   
-  // Proper sizing for good spacing
-  const minSize = w < 640 ? 60 : w < 1024 ? 80 : 100;
-  const maxSize = w < 640 ? 100 : w < 1024 ? 120 : 140;
+  // Calculate grid dimensions for proper spacing
+  const minSize = w < 640 ? 80 : w < 1024 ? 100 : 120;
+  const maxSize = w < 640 ? 120 : w < 1024 ? 140 : 160;
+  
+  // Calculate how many lily pads can fit in a row and column
+  const cols = Math.max(1, Math.floor(w / (maxSize + 40)));
+  const rows = Math.max(1, Math.ceil(count / cols));
+  
   const items = [];
-
+  
   for (let i = 0; i < count; i++) {
     const size = Math.floor(minSize + rand() * (maxSize - minSize));
     
-    // Calculate available space for positioning
-    const availableWidth = Math.max(0, w - size);
-    const availableHeight = Math.max(0, h - size);
+    // Calculate grid position
+    const col = i % cols;
+    const row = Math.floor(i / cols);
     
-    // Generate positions across the entire available area
-    const x = availableWidth > 0 ? Math.floor(rand() * availableWidth) : 0;
-    const y = availableHeight > 0 ? Math.floor(rand() * availableHeight) : 0;
+    // Calculate available space in this grid cell
+    const cellWidth = w / cols;
+    const cellHeight = h / rows;
+    
+    // Position within the cell with some randomness but ensuring good spacing
+    const padding = 20;
+    const maxX = Math.max(0, cellWidth - size - padding);
+    const maxY = Math.max(0, cellHeight - size - padding);
+    
+    const x = col * cellWidth + (maxX > 0 ? Math.floor(rand() * maxX) + padding/2 : padding/2);
+    const y = row * cellHeight + (maxY > 0 ? Math.floor(rand() * maxY) + padding/2 : padding/2);
 
     // random drift speeds (CSS animation durations)
     const drift = 7 + rand() * 10; // seconds
@@ -129,7 +137,6 @@ function generateLayout(count, w, h, seed = 42) {
     items.push({ x, y, size, drift, float, angle });
   }
   
-  console.log('Generated layout:', items);
   return items;
 }
 
@@ -210,11 +217,8 @@ export default function PurplePondSpheres() {
   }, [query]);
 
   const layout = useMemo(() => {
-    console.log('Layout calculation triggered:', { filteredLength: filtered.length, w, h, seed });
-    
     // If container size is not ready, generate a fallback layout
     if (w <= 0 || h <= 0) {
-      console.log('Using fallback layout - container size not ready');
       return generateLayout(filtered.length, 800, 600, seed); // Use reasonable defaults
     }
     
