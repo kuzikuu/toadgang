@@ -5,29 +5,25 @@
     "signature": "MHg1MGJkNTFiMDNmZGRkMjFkYjYyNzdlNzI3YjRkNjNlN2JhMTkzOTdjMDE2NDE2MGQwNGQ0ZWQxZWE4Y2M0YmExMTM4ODY2YWY2Y2VjMGJiM2ZkNGQwMjZjMTRhZjNkNDNjOTg1ODE1ZjRiNmYwNDgyYmEwY2RmYzZjNWY0YTQxMTFj"
   },
 
-  "frame": {
-    "image": "https://kuzikuu.github.io/toadgang/lily.png",
-    "buttons": [
-      {
-        "label": "Enter Purple Pond",
-        "action": "post"
-      }
-    ],
-    "postUrl": "https://kuzikuu.github.io/toadgang"
-  },
-
   "app": {
+    "version": "1",
     "name": "Purple Pond",
-    "description": "Interactive lily pad interface for Toad Gang Zora community members",
-    "icon": "https://kuzikuu.github.io/toadgang/lily.png",
-    "splash": {
-      "image": "https://kuzikuu.github.io/toadgang/lily.png",
-      "backgroundColor": "#581c87"
-    },
-    "url": "https://kuzikuu.github.io/toadgang",
+    "subtitle": "Toad Gang Zora Community",
+    "description": "Interactive lily pad interface for Toad Gang Zora community members. Discover and connect with NFT creators through an engaging, animated pond experience.",
+    "screenshotUrls": [],
+    "iconUrl": "https://kuzikuu.github.io/toadgang/lily.png",
+    "splashImageUrl": "https://kuzikuu.github.io/toadgang/lily.png",
+    "splashBackgroundColor": "#581c87",
+    "homeUrl": "https://kuzikuu.github.io/toadgang",
+    "webhookUrl": "https://kuzikuu.github.io/toadgang",
     "primaryCategory": "social",
     "secondaryCategory": "community",
     "tags": ["zora", "toadgang", "community", "toby", "web3", "social", "interactive", "lily-pads"],
-    "keywords": ["zora profiles", "toad gang", "community", "toby", "lily pads", "toadgod"]
+    "heroImageUrl": "https://kuzikuu.github.io/toadgang/lily.png",
+    "tagline": "Discover Toad Gang through interactive lily pads",
+    "ogTitle": "Purple Pond - Toad Gang Zora Community",
+    "ogDescription": "Interactive lily pad interface for Toad Gang Zora community members. Discover and connect with NFT creators and community members through an engaging, animated pond experience.",
+    "ogImageUrl": "https://kuzikuu.github.io/toadgang/lily.png",
+    "keywords": ["zora profiles", "toad gang", "community", "toby", "lily pads", "toadgod", "nft", "web3"]
   }
 }

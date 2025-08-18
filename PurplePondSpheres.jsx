@@ -104,31 +104,25 @@ function generateLayout(count, w, h, seed = 42) {
   const minSize = w < 640 ? 70 : w < 1024 ? 90 : 110;
   const maxSize = w < 640 ? 110 : w < 1024 ? 130 : 150;
   
-  // Force a grid layout to ensure even distribution
-  const cols = Math.max(3, Math.floor(w / (maxSize + 40)));
-  const rows = Math.ceil(count / cols);
-  
   const items = [];
   
   for (let i = 0; i < count; i++) {
     const size = Math.floor(minSize + rand() * (maxSize - minSize));
     
-    // Calculate grid position
-    const col = i % cols;
-    const row = Math.floor(i / cols);
+    // Simple, natural positioning with good spacing
+    const padding = 40;
+    const maxX = Math.max(0, w - size - padding);
+    const maxY = Math.max(0, h - size - padding);
     
-    // Calculate cell dimensions
-    const cellWidth = w / cols;
-    const cellHeight = h / rows;
+    // Generate random positions with better distribution
+    let x, y;
+    let attempts = 0;
     
-    // Position within the cell with some randomness but ensuring coverage
-    const padding = 30;
-    const maxX = Math.max(0, cellWidth - size - padding);
-    const maxY = Math.max(0, cellHeight - size - padding);
-    
-    // Center the lily pad in its grid cell with some random offset
-    const x = col * cellWidth + (maxX > 0 ? Math.floor(rand() * maxX) + padding/2 : padding/2);
-    const y = row * cellHeight + (maxY > 0 ? Math.floor(rand() * maxY) + padding/2 : padding/2);
+    do {
+      x = Math.floor(rand() * maxX);
+      y = Math.floor(rand() * maxY);
+      attempts++;
+    } while (attempts < 20); // Prevent infinite loops
     
     // random drift speeds (CSS animation durations)
     const drift = 7 + rand() * 10; // seconds
