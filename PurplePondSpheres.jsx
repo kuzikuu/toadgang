@@ -118,68 +118,46 @@ function generateLayout(count, w, h, seed = 42) {
     return [];
   }
   
-  // Calculate optimal lily pad sizes based on screen size - more responsive
+  // Calculate optimal lily pad sizes based on screen size
   const minSize = w < 480 ? 50 : w < 640 ? 60 : w < 768 ? 70 : w < 1024 ? 80 : 90;
   const maxSize = w < 480 ? 80 : w < 640 ? 90 : w < 768 ? 100 : w < 1024 ? 110 : 120;
   
   const items = [];
   
+  // Simple grid-based approach to ensure all lily pads fit
+  const cols = Math.max(3, Math.floor(w / (maxSize + 20)));
+  const rows = Math.ceil(count / cols);
+  
   for (let i = 0; i < count; i++) {
     const size = Math.floor(minSize + rand() * (maxSize - minSize));
     
-    // Ensure lily pads stay within the container bounds with proper padding
-    const padding = Math.max(15, size * 0.2); // Reduced padding for better fit
-    const maxX = Math.max(0, w - size - padding);
-    const maxY = Math.max(0, h - size - padding);
+    // Calculate grid position
+    const col = i % cols;
+    const row = Math.floor(i / cols);
     
-    // Generate positions with collision detection to prevent overlap
-    let x, y;
-    let attempts = 0;
-    let validPosition = false;
+    // Calculate cell dimensions
+    const cellWidth = w / cols;
+    const cellHeight = h / rows;
     
-    do {
-      // Ensure position is within container bounds
-      x = Math.floor(rand() * maxX) + padding/2;
-      y = Math.floor(rand() * maxY) + padding/2;
-      
-      // Double-check bounds
-      if (x < 0 || x > w - size || y < 0 || y > h - size) {
-        continue;
-      }
-      
-      // Check if this position overlaps with existing lily pads
-      validPosition = true;
-      for (let j = 0; j < items.length; j++) {
-        const existing = items[j];
-        const distance = Math.sqrt((x - existing.x) ** 2 + (y - existing.y) ** 2);
-        const minDistance = (size + existing.size) / 2 + padding * 0.8; // Slightly reduced spacing
-        
-        if (distance < minDistance) {
-          validPosition = false;
-          break;
-        }
-      }
-      
-      attempts++;
-    } while (!validPosition && attempts < 100); // Increased attempts for better distribution
+    // Position within the cell with some randomness but ensuring it fits
+    const padding = 20;
+    const maxX = Math.max(0, cellWidth - size - padding);
+    const maxY = Math.max(0, cellHeight - size - padding);
     
-    // If we couldn't find a good position, use a fallback position
-    if (!validPosition) {
-      // Fallback: place in a grid-like pattern to ensure coverage
-      const cols = Math.max(3, Math.floor(w / (maxSize + padding)));
-      const col = i % cols;
-      const row = Math.floor(i / cols);
-      
-      x = Math.min(maxX, col * (maxSize + padding) + padding/2);
-      y = Math.min(maxY, row * (maxSize + padding) + padding/2);
-    }
+    // Center the lily pad in its grid cell with some random offset
+    const x = col * cellWidth + (maxX > 0 ? Math.floor(rand() * maxX) + padding/2 : padding/2);
+    const y = row * cellHeight + (maxY > 0 ? Math.floor(rand() * maxY) + padding/2 : padding/2);
+    
+    // Double-check bounds to ensure lily pad is fully inside container
+    const finalX = Math.max(padding, Math.min(x, w - size - padding));
+    const finalY = Math.max(padding, Math.min(y, h - size - padding));
     
     // random drift speeds (CSS animation durations)
     const drift = 7 + rand() * 10; // seconds
     const float = 5 + rand() * 7; // seconds
     const angle = Math.floor(rand() * 360);
 
-    items.push({ x, y, size, drift, float, angle });
+    items.push({ x: finalX, y: finalY, size, drift, float, angle });
   }
   
   return items;
