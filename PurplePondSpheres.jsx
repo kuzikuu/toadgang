@@ -100,29 +100,50 @@ function generateLayout(count, w, h, seed = 42) {
     return [];
   }
   
-  // Calculate optimal lily pad sizes based on screen size
-  const minSize = w < 640 ? 70 : w < 1024 ? 90 : 110;
-  const maxSize = w < 640 ? 110 : w < 1024 ? 130 : 150;
+  // Calculate optimal lily pad sizes based on screen size - more responsive
+  const minSize = w < 480 ? 50 : w < 640 ? 60 : w < 768 ? 70 : w < 1024 ? 80 : 90;
+  const maxSize = w < 480 ? 80 : w < 640 ? 90 : w < 768 ? 100 : w < 1024 ? 110 : 120;
   
   const items = [];
   
   for (let i = 0; i < count; i++) {
     const size = Math.floor(minSize + rand() * (maxSize - minSize));
     
-    // Simple, natural positioning with good spacing
-    const padding = 40;
+    // Ensure lily pads stay within bounds with proper padding
+    const padding = Math.max(20, size * 0.3); // Responsive padding
     const maxX = Math.max(0, w - size - padding);
     const maxY = Math.max(0, h - size - padding);
     
-    // Generate random positions with better distribution
+    // Generate positions with collision detection to prevent overlap
     let x, y;
     let attempts = 0;
+    let validPosition = false;
     
     do {
-      x = Math.floor(rand() * maxX);
-      y = Math.floor(rand() * maxY);
+      x = Math.floor(rand() * maxX) + padding/2;
+      y = Math.floor(rand() * maxY) + padding/2;
+      
+      // Check if this position overlaps with existing lily pads
+      validPosition = true;
+      for (let j = 0; j < items.length; j++) {
+        const existing = items[j];
+        const distance = Math.sqrt((x - existing.x) ** 2 + (y - existing.y) ** 2);
+        const minDistance = (size + existing.size) / 2 + padding;
+        
+        if (distance < minDistance) {
+          validPosition = false;
+          break;
+        }
+      }
+      
       attempts++;
-    } while (attempts < 20); // Prevent infinite loops
+    } while (!validPosition && attempts < 50); // Prevent infinite loops
+    
+    // If we couldn't find a good position, use the last generated one
+    if (!validPosition) {
+      x = Math.floor(rand() * maxX) + padding/2;
+      y = Math.floor(rand() * maxY) + padding/2;
+    }
     
     // random drift speeds (CSS animation durations)
     const drift = 7 + rand() * 10; // seconds
@@ -476,13 +497,13 @@ export default function PurplePondSpheres() {
           triggerHaptic();
           setShowRegistration(true);
         }}
-        className="fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full bg-fuchsia-600/90 hover:bg-fuchsia-500 active:bg-fuchsia-700 transition-all duration-200 shadow-lg shadow-fuchsia-900/40 hover:scale-110 touch-manipulation"
+        className="fixed bottom-4 right-4 z-50 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-fuchsia-600/90 hover:bg-fuchsia-500 active:bg-fuchsia-700 transition-all duration-200 shadow-lg shadow-fuchsia-900/40 hover:scale-110 touch-manipulation"
         title="Register for Toad Gang"
       >
         <img 
           src="/toby.png" 
           alt="Toby" 
-          className="w-full h-full object-contain p-2"
+          className="w-full h-full object-contain p-1 sm:p-1.5 md:p-2"
         />
       </button>
 
