@@ -124,40 +124,24 @@ function generateLayout(count, w, h, seed = 42) {
   
   const items = [];
   
-  // Simple grid-based approach to ensure all lily pads fit
-  const cols = Math.max(3, Math.floor(w / (maxSize + 20)));
-  const rows = Math.ceil(count / cols);
-  
   for (let i = 0; i < count; i++) {
     const size = Math.floor(minSize + rand() * (maxSize - minSize));
     
-    // Calculate grid position
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    
-    // Calculate cell dimensions
-    const cellWidth = w / cols;
-    const cellHeight = h / rows;
-    
-    // Position within the cell with some randomness but ensuring it fits
+    // Simple random positioning with guaranteed bounds
     const padding = 20;
-    const maxX = Math.max(0, cellWidth - size - padding);
-    const maxY = Math.max(0, cellHeight - size - padding);
+    const maxX = w - size - padding;
+    const maxY = h - size - padding;
     
-    // Center the lily pad in its grid cell with some random offset
-    const x = col * cellWidth + (maxX > 0 ? Math.floor(rand() * maxX) + padding/2 : padding/2);
-    const y = row * cellHeight + (maxY > 0 ? Math.floor(rand() * maxY) + padding/2 : padding/2);
-    
-    // Double-check bounds to ensure lily pad is fully inside container
-    const finalX = Math.max(padding, Math.min(x, w - size - padding));
-    const finalY = Math.max(padding, Math.min(y, h - size - padding));
+    // Generate random position within bounds
+    const x = Math.max(padding, Math.min(maxX, Math.floor(rand() * maxX)));
+    const y = Math.max(padding, Math.min(maxY, Math.floor(rand() * maxY)));
     
     // random drift speeds (CSS animation durations)
     const drift = 7 + rand() * 10; // seconds
     const float = 5 + rand() * 7; // seconds
     const angle = Math.floor(rand() * 360);
 
-    items.push({ x: finalX, y: finalY, size, drift, float, angle });
+    items.push({ x, y, size, drift, float, angle });
   }
   
   return items;
