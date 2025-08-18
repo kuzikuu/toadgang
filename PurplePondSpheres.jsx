@@ -127,7 +127,13 @@ export default function PurplePondSpheres() {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   
-  const { setFrameReady, isFrameReady } = useMiniKit();
+  const miniKitData = useMiniKit();
+  const { setFrameReady, isFrameReady } = miniKitData;
+  
+  // Debug MiniKit initialization
+  useEffect(() => {
+    console.log('MiniKit data:', miniKitData);
+  }, [miniKitData]);
 
   // Detect mobile device
   useEffect(() => {
@@ -145,7 +151,10 @@ export default function PurplePondSpheres() {
 
   // Initialize the frame - following Base documentation exactly
   useEffect(() => {
-    if (!isFrameReady) {
+    console.log('useMiniKit state:', { isFrameReady, setFrameReady: typeof setFrameReady });
+    
+    if (!isFrameReady && setFrameReady) {
+      console.log('Calling setFrameReady()...');
       setFrameReady();
     }
   }, [setFrameReady, isFrameReady]);
