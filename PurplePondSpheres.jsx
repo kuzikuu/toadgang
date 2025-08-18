@@ -100,35 +100,42 @@ function generateLayout(count, w, h, seed = 42) {
     return [];
   }
   
-  // Calculate grid dimensions for proper spacing
-  const minSize = w < 640 ? 80 : w < 1024 ? 100 : 120;
-  const maxSize = w < 640 ? 120 : w < 1024 ? 140 : 160;
-  
-  // Calculate how many lily pads can fit in a row and column
-  const cols = Math.max(1, Math.floor(w / (maxSize + 40)));
-  const rows = Math.max(1, Math.ceil(count / cols));
+  // Calculate optimal lily pad sizes based on screen size
+  const minSize = w < 640 ? 70 : w < 1024 ? 90 : 110;
+  const maxSize = w < 640 ? 110 : w < 1024 ? 130 : 150;
   
   const items = [];
   
   for (let i = 0; i < count; i++) {
     const size = Math.floor(minSize + rand() * (maxSize - minSize));
     
-    // Calculate grid position
-    const col = i % cols;
-    const row = Math.floor(i / cols);
+    // Calculate safe boundaries to keep lily pads within the container
+    const maxX = Math.max(0, w - size);
+    const maxY = Math.max(0, h - size);
     
-    // Calculate available space in this grid cell
-    const cellWidth = w / cols;
-    const cellHeight = h / rows;
+    // Generate positions with better distribution
+    let attempts = 0;
+    let x, y;
     
-    // Position within the cell with some randomness but ensuring good spacing
-    const padding = 20;
-    const maxX = Math.max(0, cellWidth - size - padding);
-    const maxY = Math.max(0, cellHeight - size - padding);
+    do {
+      // Use different distribution strategies for better coverage
+      if (i < count * 0.3) {
+        // First 30%: spread across top area
+        x = Math.floor(rand() * maxX);
+        y = Math.floor(rand() * (maxY * 0.4));
+      } else if (i < count * 0.6) {
+        // Next 30%: spread across middle area
+        x = Math.floor(rand() * maxX);
+        y = Math.floor(maxY * 0.3 + rand() * (maxY * 0.4));
+      } else {
+        // Last 40%: spread across bottom area
+        x = Math.floor(rand() * maxX);
+        y = Math.floor(maxY * 0.6 + rand() * (maxY * 0.4));
+      }
+      
+      attempts++;
+    } while (attempts < 10); // Prevent infinite loops
     
-    const x = col * cellWidth + (maxX > 0 ? Math.floor(rand() * maxX) + padding/2 : padding/2);
-    const y = row * cellHeight + (maxY > 0 ? Math.floor(rand() * maxY) + padding/2 : padding/2);
-
     // random drift speeds (CSS animation durations)
     const drift = 7 + rand() * 10; // seconds
     const float = 5 + rand() * 7; // seconds
