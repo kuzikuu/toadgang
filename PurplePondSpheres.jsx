@@ -95,16 +95,22 @@ function useContainerSize() {
 function generateLayout(count, w, h, seed = 42) {
   const rand = mulberry32(seed);
   // Proper sizing for good spacing
-  const minSize = w < 640 ? 80 : w < 1024 ? 100 : 120;
-  const maxSize = w < 640 ? 120 : w < 1024 ? 140 : 160;
+  const minSize = w < 640 ? 60 : w < 1024 ? 80 : 100;
+  const maxSize = w < 640 ? 100 : w < 1024 ? 120 : 140;
   const items = [];
 
   for (let i = 0; i < count; i++) {
     const size = Math.floor(minSize + rand() * (maxSize - minSize));
-    // Proper padding to prevent crowding
-    const padding = w < 640 ? 40 : 60; // Adequate spacing on all devices
-    const x = Math.floor(rand() * Math.max(1, w - size - padding)) + padding / 2;
-    const y = Math.floor(rand() * Math.max(1, h - size - padding)) + padding / 2;
+    // Adaptive padding based on container size
+    const padding = Math.min(w, h) < 400 ? 20 : Math.min(w, h) < 600 ? 30 : 40;
+    
+    // Ensure we have enough space for positioning
+    const maxX = Math.max(0, w - size - padding);
+    const maxY = Math.max(0, h - size - padding);
+    
+    // Generate positions with proper bounds checking
+    const x = maxX > 0 ? Math.floor(rand() * maxX) + padding / 2 : padding / 2;
+    const y = maxY > 0 ? Math.floor(rand() * maxY) + padding / 2 : padding / 2;
 
     // random drift speeds (CSS animation durations)
     const drift = 7 + rand() * 10; // seconds
