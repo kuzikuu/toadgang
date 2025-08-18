@@ -94,14 +94,15 @@ function useContainerSize() {
 
 function generateLayout(count, w, h, seed = 42) {
   const rand = mulberry32(seed);
-  // Mobile-optimized sizes
-  const minSize = w < 640 ? 60 : w < 1024 ? 80 : 88; // Smaller on mobile
-  const maxSize = w < 640 ? 100 : w < 1024 ? 120 : 148;
+  // Proper sizing for good spacing
+  const minSize = w < 640 ? 80 : w < 1024 ? 100 : 120;
+  const maxSize = w < 640 ? 120 : w < 1024 ? 140 : 160;
   const items = [];
 
   for (let i = 0; i < count; i++) {
     const size = Math.floor(minSize + rand() * (maxSize - minSize));
-    const padding = w < 640 ? 8 : 16; // Smaller padding on mobile
+    // Proper padding to prevent crowding
+    const padding = w < 640 ? 40 : 60; // Adequate spacing on all devices
     const x = Math.floor(rand() * Math.max(1, w - size - padding)) + padding / 2;
     const y = Math.floor(rand() * Math.max(1, h - size - padding)) + padding / 2;
 
