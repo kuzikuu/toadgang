@@ -80,15 +80,33 @@ function mulberry32(a) {
 function useContainerSize() {
   const ref = useRef(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
+  
   useEffect(() => {
     if (!ref.current) return;
-    const ro = new ResizeObserver((entries) => {
-      const { width, height } = entries[0].contentRect;
-      setSize({ w: width, h: height });
-    });
+    
+    const updateSize = () => {
+      if (ref.current) {
+        const rect = ref.current.getBoundingClientRect();
+        setSize({ w: rect.width, h: rect.height });
+      }
+    };
+    
+    // Initial size
+    updateSize();
+    
+    // Resize observer for dynamic updates
+    const ro = new ResizeObserver(updateSize);
     ro.observe(ref.current);
-    return () => ro.disconnect();
+    
+    // Also listen for window resize events
+    window.addEventListener('resize', updateSize);
+    
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', updateSize);
+    };
   }, []);
+  
   return [ref, size];
 }
 
@@ -109,8 +127,8 @@ function generateLayout(count, w, h, seed = 42) {
   for (let i = 0; i < count; i++) {
     const size = Math.floor(minSize + rand() * (maxSize - minSize));
     
-    // Ensure lily pads stay within bounds with proper padding
-    const padding = Math.max(20, size * 0.3); // Responsive padding
+    // Ensure lily pads stay within the container bounds with proper padding
+    const padding = Math.max(15, size * 0.2); // Reduced padding for better fit
     const maxX = Math.max(0, w - size - padding);
     const maxY = Math.max(0, h - size - padding);
     
@@ -120,15 +138,21 @@ function generateLayout(count, w, h, seed = 42) {
     let validPosition = false;
     
     do {
+      // Ensure position is within container bounds
       x = Math.floor(rand() * maxX) + padding/2;
       y = Math.floor(rand() * maxY) + padding/2;
+      
+      // Double-check bounds
+      if (x < 0 || x > w - size || y < 0 || y > h - size) {
+        continue;
+      }
       
       // Check if this position overlaps with existing lily pads
       validPosition = true;
       for (let j = 0; j < items.length; j++) {
         const existing = items[j];
         const distance = Math.sqrt((x - existing.x) ** 2 + (y - existing.y) ** 2);
-        const minDistance = (size + existing.size) / 2 + padding;
+        const minDistance = (size + existing.size) / 2 + padding * 0.8; // Slightly reduced spacing
         
         if (distance < minDistance) {
           validPosition = false;
@@ -137,12 +161,17 @@ function generateLayout(count, w, h, seed = 42) {
       }
       
       attempts++;
-    } while (!validPosition && attempts < 50); // Prevent infinite loops
+    } while (!validPosition && attempts < 100); // Increased attempts for better distribution
     
-    // If we couldn't find a good position, use the last generated one
+    // If we couldn't find a good position, use a fallback position
     if (!validPosition) {
-      x = Math.floor(rand() * maxX) + padding/2;
-      y = Math.floor(rand() * maxY) + padding/2;
+      // Fallback: place in a grid-like pattern to ensure coverage
+      const cols = Math.max(3, Math.floor(w / (maxSize + padding)));
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      
+      x = Math.min(maxX, col * (maxSize + padding) + padding/2);
+      y = Math.min(maxY, row * (maxSize + padding) + padding/2);
     }
     
     // random drift speeds (CSS animation durations)
