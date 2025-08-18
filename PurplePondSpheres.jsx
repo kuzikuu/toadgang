@@ -3,7 +3,6 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Search, Shuffle, X, Share2 } from "lucide-react";
-import { useMiniKit, useComposeCast } from '@coinbase/onchainkit/minikit';
 
 // --- Data: Zora profiles ---
 const TOAD_LEAFS = [
@@ -61,10 +60,10 @@ const TOAD_LEAFS = [
   { name: "bleedndodgerblu", url: "https://zora.co/@bleedndodgerblu" },
   { name: "yellon982", url: "https://zora.co/@yellon982" },
   { name: "bull_sararu", url: "https://zora.co/@bull_sararu" },
-{ name: "christian", url: "https://zora.co/@clj38" },
-{ name: "johndabeast", url: "https://zora.co/@johndabeast" },
-{ name: "bloo", url: "https://zora.co/@bloo" },
-{ name: "g_l0", url: "https://zora.co/@g_l0" },
+  { name: "christian", url: "https://zora.co/@clj38" },
+  { name: "johndabeast", url: "https://zora.co/@johndabeast" },
+  { name: "bloo", url: "https://zora.co/@bloo" },
+  { name: "g_l0", url: "https://zora.co/@g_l0" },
 ];
 
 // Utility to get a seeded RNG so positions are repeatable per shuffle
@@ -183,9 +182,6 @@ export default function PurplePondSpheres() {
   const [submitted, setSubmitted] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  
-  const { setFrameReady, isFrameReady } = useMiniKit();
-  const { composeCast } = useComposeCast();
 
   // Haptic feedback function
   const triggerHaptic = () => {
@@ -207,17 +203,6 @@ export default function PurplePondSpheres() {
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  // Initialize the frame - following Base documentation exactly
-  useEffect(() => {
-    if (!isFrameReady && setFrameReady) {
-      setFrameReady();
-    }
-  }, [setFrameReady, isFrameReady]);
-
-
-
-
 
   // Preload the splash image for better UX
   useEffect(() => {
@@ -296,13 +281,21 @@ export default function PurplePondSpheres() {
   };
 
   const handleShare = () => {
-    composeCast({
-      text: 'Check out Purple Pond - the interactive lily pad interface for Toad Gang Zora community members! 🐸🍃',
-      embeds: ['https://kuzikuu.github.io/toadgang'],
-    });
+    // Simple share functionality without Mini App integration
+    if (navigator.share) {
+      navigator.share({
+        title: 'Purple Pond - Toad Gang Zora Community',
+        text: 'Check out Purple Pond - the interactive lily pad interface for Toad Gang Zora community members! 🐸🍃',
+        url: 'https://kuzikuu.github.io/toadgang'
+      });
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText('https://kuzikuu.github.io/toadgang');
+      alert('Link copied to clipboard!');
+    }
   };
 
-  // Show loading screen only briefly - prioritize showing the app for Farcaster
+  // Show loading screen only briefly
   if (!isImageLoaded) {
     // On mobile, show app content immediately to bypass splash screen
     if (isMobile) {
@@ -338,7 +331,7 @@ export default function PurplePondSpheres() {
       );
     }
 
-    // Desktop loading screen (unchanged)
+    // Desktop loading screen
     return (
       <div className="fixed inset-0 bg-purple-950 flex items-center justify-center z-50">
         <div className="text-center">
@@ -372,8 +365,6 @@ export default function PurplePondSpheres() {
       </div>
     );
   }
-
-
 
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
@@ -446,16 +437,16 @@ export default function PurplePondSpheres() {
           };
 
           return (
-                         <a
-               key={item.name}
-               href={item.url}
-               target="_blank"
-               rel="noopener noreferrer"
-               title={item.name}
-               onClick={triggerHaptic}
-               className="group absolute select-none grid place-items-center text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300/80 touch-manipulation"
-               style={style}
-             >
+            <a
+              key={item.name}
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={item.name}
+              onClick={triggerHaptic}
+              className="group absolute select-none grid place-items-center text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300/80 touch-manipulation"
+              style={style}
+            >
               <div className="relative w-full h-full">
                 <img
                   src="/lily.png"
