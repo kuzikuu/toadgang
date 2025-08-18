@@ -11,10 +11,11 @@
     "buttons": [
       {
         "label": "Enter Purple Pond",
-        "action": "post"
+        "action": "launch_frame",
+        "name": "Purple Pond",
+        "url": "https://kuzikuu.github.io/toadgang"
       }
-    ],
-    "postUrl": "https://kuzikuu.github.io/toadgang"
+    ]
   },
   "app": {
     "name": "Purple Pond",
@@ -25,7 +26,9 @@
       "backgroundColor": "#581c87"
     },
     "url": "https://kuzikuu.github.io/toadgang",
-    "category": "social",
-    "tags": ["zora", "toadgang", "community"]
+    "primaryCategory": "social",
+    "secondaryCategory": "community",
+    "tags": ["zora", "toadgang", "community", "nft", "web3", "social", "interactive", "lily-pads"],
+    "keywords": ["zora profiles", "toad gang", "community", "interactive", "lily pads", "nft community"]
   }
 }

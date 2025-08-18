@@ -2,8 +2,8 @@
 // Assets expected at: public/pond.png and public/lily.png (or adjust paths below)
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Shuffle, X } from "lucide-react";
-import { useMiniKit } from '@coinbase/onchainkit/minikit';
+import { Search, Shuffle, X, Share2 } from "lucide-react";
+import { useMiniKit, useComposeCast } from '@coinbase/onchainkit/minikit';
 
 // --- Data: Zora profiles ---
 const TOAD_LEAFS = [
@@ -127,13 +127,15 @@ export default function PurplePondSpheres() {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   
-  const miniKitData = useMiniKit();
-  const { setFrameReady, isFrameReady } = miniKitData;
-  
-  // Debug MiniKit initialization
-  useEffect(() => {
-    console.log('MiniKit data:', miniKitData);
-  }, [miniKitData]);
+  const { setFrameReady, isFrameReady } = useMiniKit();
+  const { composeCast } = useComposeCast();
+
+  // Haptic feedback function
+  const triggerHaptic = () => {
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50); // Short vibration for lily pad clicks
+    }
+  };
 
   // Detect mobile device
   useEffect(() => {
@@ -151,10 +153,7 @@ export default function PurplePondSpheres() {
 
   // Initialize the frame - following Base documentation exactly
   useEffect(() => {
-    console.log('useMiniKit state:', { isFrameReady, setFrameReady: typeof setFrameReady });
-    
     if (!isFrameReady && setFrameReady) {
-      console.log('Calling setFrameReady()...');
       setFrameReady();
     }
   }, [setFrameReady, isFrameReady]);
@@ -235,6 +234,13 @@ export default function PurplePondSpheres() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleShare = () => {
+    composeCast({
+      text: 'Check out Purple Pond - the interactive lily pad interface for Toad Gang Zora community members! 🐸🍃',
+      embeds: ['https://kuzikuu.github.io/toadgang'],
+    });
   };
 
   // Show loading screen only briefly - prioritize showing the app for Farcaster
@@ -342,12 +348,27 @@ export default function PurplePondSpheres() {
           />
         </div>
         <button
-          onClick={() => setSeed(Math.floor(Math.random() * 100000))}
+          onClick={() => {
+            triggerHaptic();
+            setSeed(Math.floor(Math.random() * 100000));
+          }}
           className="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 sm:px-3 sm:py-2 bg-fuchsia-600/90 hover:bg-fuchsia-500 active:bg-fuchsia-700 transition shadow-lg shadow-fuchsia-900/40 touch-manipulation"
         >
           <Shuffle className="h-4 w-4 sm:h-5 sm:w-5" />
           <span className="sm:hidden">Shuffle Layout</span>
           <span className="hidden sm:inline">Shuffle</span>
+        </button>
+        <button
+          onClick={() => {
+            triggerHaptic();
+            handleShare();
+          }}
+          className="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 sm:px-3 sm:py-2 bg-purple-600/90 hover:bg-purple-500 active:bg-purple-700 transition shadow-lg shadow-purple-900/40 touch-manipulation"
+          title="Share Purple Pond"
+        >
+          <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
+          <span className="sm:hidden">Share</span>
+          <span className="hidden sm:inline">Share</span>
         </button>
       </div>
 
@@ -366,15 +387,16 @@ export default function PurplePondSpheres() {
           };
 
           return (
-            <a
-              key={item.name}
-              href={item.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={item.name}
-              className="group absolute select-none grid place-items-center text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300/80 touch-manipulation"
-              style={style}
-            >
+                         <a
+               key={item.name}
+               href={item.url}
+               target="_blank"
+               rel="noopener noreferrer"
+               title={item.name}
+               onClick={triggerHaptic}
+               className="group absolute select-none grid place-items-center text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300/80 touch-manipulation"
+               style={style}
+             >
               <div className="relative w-full h-full">
                 <img
                   src="/lily.png"
@@ -429,7 +451,10 @@ export default function PurplePondSpheres() {
 
       {/* Registration Button */}
       <button
-        onClick={() => setShowRegistration(true)}
+        onClick={() => {
+          triggerHaptic();
+          setShowRegistration(true);
+        }}
         className="fixed bottom-4 right-4 z-50 w-16 h-16 rounded-full bg-fuchsia-600/90 hover:bg-fuchsia-500 active:bg-fuchsia-700 transition-all duration-200 shadow-lg shadow-fuchsia-900/40 hover:scale-110 touch-manipulation"
         title="Register for Toad Gang"
       >
