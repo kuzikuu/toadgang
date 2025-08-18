@@ -124,24 +124,50 @@ function generateLayout(count, w, h, seed = 42) {
   
   const items = [];
   
+  // Create a grid of potential positions to ensure even distribution
+  const gridCols = Math.max(4, Math.floor(w / (maxSize + 30)));
+  const gridRows = Math.max(3, Math.floor(h / (maxSize + 30)));
+  const cellWidth = w / gridCols;
+  const cellHeight = h / gridRows;
+  
+  // Create array of all possible grid positions
+  const positions = [];
+  for (let row = 0; row < gridRows; row++) {
+    for (let col = 0; col < gridCols; col++) {
+      positions.push({ row, col });
+    }
+  }
+  
+  // Shuffle positions to randomize the order
+  for (let i = positions.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [positions[i], positions[j]] = [positions[j], positions[i]];
+  }
+  
   for (let i = 0; i < count; i++) {
     const size = Math.floor(minSize + rand() * (maxSize - minSize));
     
-    // Simple random positioning with guaranteed bounds
-    const padding = 20;
-    const maxX = w - size - padding;
-    const maxY = h - size - padding;
+    // Get position from shuffled grid
+    const pos = positions[i % positions.length];
     
-    // Generate random position within bounds
-    const x = Math.max(padding, Math.min(maxX, Math.floor(rand() * maxX)));
-    const y = Math.max(padding, Math.min(maxY, Math.floor(rand() * maxY)));
+    // Calculate position within the grid cell with some randomness
+    const padding = 15;
+    const maxOffsetX = Math.max(0, cellWidth - size - padding);
+    const maxOffsetY = Math.max(0, cellHeight - size - padding);
+    
+    const x = pos.col * cellWidth + padding + (maxOffsetX > 0 ? Math.floor(rand() * maxOffsetX) : 0);
+    const y = pos.row * cellHeight + padding + (maxOffsetY > 0 ? Math.floor(rand() * maxOffsetY) : 0);
+    
+    // Ensure final bounds checking
+    const finalX = Math.max(padding, Math.min(w - size - padding, x));
+    const finalY = Math.max(padding, Math.min(h - size - padding, y));
     
     // random drift speeds (CSS animation durations)
     const drift = 7 + rand() * 10; // seconds
     const float = 5 + rand() * 7; // seconds
     const angle = Math.floor(rand() * 360);
 
-    items.push({ x, y, size, drift, float, angle });
+    items.push({ x: finalX, y: finalY, size, drift, float, angle });
   }
   
   return items;
