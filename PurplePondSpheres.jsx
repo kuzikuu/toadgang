@@ -3,6 +3,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Search, Shuffle, X, Share2 } from "lucide-react";
+import { useMiniKit, useComposeCast } from '@coinbase/onchainkit/minikit';
 
 // --- Data: Zora profiles ---
 const TOAD_LEAFS = [
@@ -123,50 +124,56 @@ function generateLayout(count, w, h, seed = 42) {
   
   const items = [];
   
-  // Create a grid of potential positions to ensure even distribution
-  const gridCols = Math.max(4, Math.floor(w / (maxSize + 30)));
-  const gridRows = Math.max(3, Math.floor(h / (maxSize + 30)));
-  const cellWidth = w / gridCols;
-  const cellHeight = h / gridRows;
-  
-  // Create array of all possible grid positions
-  const positions = [];
-  for (let row = 0; row < gridRows; row++) {
-    for (let col = 0; col < gridCols; col++) {
-      positions.push({ row, col });
-    }
-  }
-  
-  // Shuffle positions to randomize the order
-  for (let i = positions.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
-    [positions[i], positions[j]] = [positions[j], positions[i]];
-  }
-  
+  // Use natural random positioning with collision detection for better distribution
   for (let i = 0; i < count; i++) {
     const size = Math.floor(minSize + rand() * (maxSize - minSize));
     
-    // Get position from shuffled grid
-    const pos = positions[i % positions.length];
+    let x, y;
+    let attempts = 0;
+    const maxAttempts = 100;
     
-    // Calculate position within the grid cell with some randomness
-    const padding = 15;
-    const maxOffsetX = Math.max(0, cellWidth - size - padding);
-    const maxOffsetY = Math.max(0, cellHeight - size - padding);
+    do {
+      // Generate random position within bounds
+      const padding = 20;
+      const maxX = w - size - padding;
+      const maxY = h - size - padding;
+      
+      x = padding + Math.floor(rand() * maxX);
+      y = padding + Math.floor(rand() * maxY);
+      
+      // Check collision with existing lily pads
+      let hasCollision = false;
+      for (let j = 0; j < items.length; j++) {
+        const existing = items[j];
+        const distance = Math.sqrt(
+          Math.pow(x + size/2 - (existing.x + existing.size/2), 2) + 
+          Math.pow(y + size/2 - (existing.y + existing.size/2), 2)
+        );
+        
+        // Minimum distance between lily pad centers
+        const minDistance = (size + existing.size) / 2 + 10;
+        
+        if (distance < minDistance) {
+          hasCollision = true;
+          break;
+        }
+      }
+      
+      if (!hasCollision) break;
+      attempts++;
+    } while (attempts < maxAttempts);
     
-    const x = pos.col * cellWidth + padding + (maxOffsetX > 0 ? Math.floor(rand() * maxOffsetX) : 0);
-    const y = pos.row * cellHeight + padding + (maxOffsetY > 0 ? Math.floor(rand() * maxOffsetY) : 0);
-    
-    // Ensure final bounds checking
-    const finalX = Math.max(padding, Math.min(w - size - padding, x));
-    const finalY = Math.max(padding, Math.min(h - size - padding, y));
+    // If we couldn't find a good position, use the last generated one
+    // but ensure it's within bounds
+    x = Math.max(20, Math.min(w - size - 20, x));
+    y = Math.max(20, Math.min(h - size - 20, y));
     
     // random drift speeds (CSS animation durations)
     const drift = 7 + rand() * 10; // seconds
     const float = 5 + rand() * 7; // seconds
     const angle = Math.floor(rand() * 360);
 
-    items.push({ x: finalX, y: finalY, size, drift, float, angle });
+    items.push({ x, y, size, drift, float, angle });
   }
   
   return items;
@@ -182,6 +189,9 @@ export default function PurplePondSpheres() {
   const [submitted, setSubmitted] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  
+  const { setFrameReady, isFrameReady } = useMiniKit();
+  const { composeCast } = useComposeCast();
 
   // Haptic feedback function
   const triggerHaptic = () => {
@@ -203,6 +213,13 @@ export default function PurplePondSpheres() {
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Initialize the frame - following Base documentation exactly
+  useEffect(() => {
+    if (!isFrameReady && setFrameReady) {
+      setFrameReady();
+    }
+  }, [setFrameReady, isFrameReady]);
 
   // Preload the splash image for better UX
   useEffect(() => {
@@ -281,18 +298,11 @@ export default function PurplePondSpheres() {
   };
 
   const handleShare = () => {
-    // Simple share functionality without Mini App integration
-    if (navigator.share) {
-      navigator.share({
-        title: 'Purple Pond - Toad Gang Zora Community',
-        text: 'Check out Purple Pond - the interactive lily pad interface for Toad Gang Zora community members! 🐸🍃',
-        url: 'https://kuzikuu.github.io/toadgang'
-      });
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText('https://kuzikuu.github.io/toadgang');
-      alert('Link copied to clipboard!');
-    }
+    // Use Mini App composeCast for Farcaster integration
+    composeCast({
+      text: 'Check out Purple Pond - the interactive lily pad interface for Toad Gang Zora community members! 🐸🍃',
+      embeds: ['https://kuzikuu.github.io/toadgang'],
+    });
   };
 
   // Show loading screen only briefly
