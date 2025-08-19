@@ -5,7 +5,7 @@ import { base } from 'wagmi/chains';
 export function MiniKitContextProvider({ children }) {
   return (
     <MiniKitProvider 
-      apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY || 'your_api_key_here'} 
+      apiKey={process.env.NEXT_PUBLIC_CDP_CLIENT_API_KEY || 'your_api_key_here'} 
       chain={base}
       config={{
         appearance: {
