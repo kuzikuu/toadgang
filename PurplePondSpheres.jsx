@@ -118,9 +118,9 @@ function generateLayout(count, w, h, seed = 42) {
     return [];
   }
   
-  // Use full viewport width for lily pad positioning
+  // Use full viewport dimensions for lily pad positioning
   const fullWidth = window.innerWidth || w;
-  const fullHeight = h;
+  const fullHeight = window.innerHeight || h;
   
   // Calculate optimal lily pad sizes based on screen size
   const minSize = fullWidth < 480 ? 50 : fullWidth < 640 ? 60 : fullWidth < 768 ? 70 : fullWidth < 1024 ? 80 : 90;
@@ -137,7 +137,7 @@ function generateLayout(count, w, h, seed = 42) {
     const maxAttempts = 100;
     
     do {
-      // Generate random position across full viewport width
+      // Generate random position across full viewport dimensions
       const padding = 20;
       const maxX = fullWidth - size - padding;
       const maxY = fullHeight - size - padding;
@@ -263,7 +263,10 @@ export default function PurplePondSpheres() {
       return generateLayout(filtered.length, viewportWidth, viewportHeight, seed);
     }
     
-    return generateLayout(filtered.length, w, h, seed);
+    // Use full viewport dimensions for better coverage
+    const viewportWidth = window.innerWidth || w;
+    const viewportHeight = window.innerHeight || h;
+    return generateLayout(filtered.length, viewportWidth, viewportHeight, seed);
   }, [filtered.length, w, h, seed]);
 
   const handleRegistrationSubmit = async (e) => {
