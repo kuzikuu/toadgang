@@ -32,22 +32,6 @@ export async function generateMetadata(): Promise<Metadata> {
       description: 'Interactive lily pad interface for Toad Gang Zora community members',
       images: ['https://kuzikuu.github.io/toadgang/purplepond.png'],
     },
-    other: {
-      'fc:frame': JSON.stringify({
-        version: 'next',
-        imageUrl: 'https://kuzikuu.github.io/toadgang/purplepond.png',
-        button: {
-          title: 'Launch Purple Pond',
-          action: {
-            type: 'launch_frame',
-            name: 'Purple Pond',
-            url: URL,
-            splashImageUrl: 'https://kuzikuu.github.io/toadgang/purplepond.png',
-            splashBackgroundColor: '#581c87',
-          },
-        },
-      }),
-    },
   };
 }
 

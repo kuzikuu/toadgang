@@ -465,3 +465,241 @@ Basic functionality and discovery/sharing checklists: confirm load, images, wall
 * JSONLint
 * Eruda
 * Base Discord — #minikit channel
+
+
+# Install
+
+> Scaffold a new MiniKit project, install dependencies, and run it locally
+
+## What is a Mini App?
+
+A mini app is a lightweight web app that runs directly inside Farcaster clients like Base App, without needing to open a browser or download anything. Built using familiar tools like Next.js and MiniKit, mini apps behave just like normal apps — but launch instantly from posts, making them feel native to the social experience.
+
+This guide gets you from zero to a running Mini App using the MiniKit template.
+
+## Prerequisites
+
+1. Farcaster account (for testing and manifest signing)
+2. Optional: Coinbase Developer Platform account for a Client API key
+
+## Create your project
+
+<Steps>
+  <Step title="Use the CLI to scaffold a Mini App">
+    ```bash Terminal
+    npx create-onchain --mini
+    ```
+
+    You’ll be prompted for a CDP Client API key. You can generate one in the Coinbase Developer Platform.
+
+    <Tip>
+      These docs are LLM‑friendly—reference llms.txt in your editor to streamline builds and prompts:
+      [https://docs.base.org/base-app/build-with-minikit/llms.txt](https://docs.base.org/base-app/build-with-minikit/llms.txt)
+    </Tip>
+  </Step>
+
+  <Step title="Skip manifest setup for now">
+    You’ll configure the manifest after you have a stable URL in the Deploy step.
+  </Step>
+
+  <Step title="Install dependencies and run locally">
+    ```bash Terminal
+    cd your-project-name
+    npm install
+    npm run dev
+    ```
+  </Step>
+</Steps>
+
+Next: Deploy your app to a live URL used when creating your manifest.
+# Deploy
+
+> Get a stable HTTPS URL for testing your Mini App in Farcaster
+
+To create your manifest and test your Mini App, you need a live HTTPS URL.
+
+## Deploy to Vercel (recommended)
+
+<Steps>
+  <Step title="Install Vercel CLI">
+    ```bash Terminal
+    npm install -g vercel
+    ```
+  </Step>
+
+  <Step title="Deploy">
+    ```bash Terminal
+    vercel
+    ```
+  </Step>
+
+  <Step title="Set environment variables">
+    Use `vercel env add` or the dashboard to add:
+
+    * NEXT\_PUBLIC\_CDP\_CLIENT\_API\_KEY
+    * NEXT\_PUBLIC\_URL (deployed app URL)
+    * NEXT\_PUBLIC\_IMAGE\_URL (optional)
+    * NEXT\_PUBLIC\_SPLASH\_IMAGE\_URL (optional)
+    * NEXT\_PUBLIC\_SPLASH\_BACKGROUND\_COLOR (optional)
+  </Step>
+</Steps>
+
+Then verify your URL works in a browser and proceed to manifest creation.
+
+## Alternative: ngrok (for local testing)
+
+<AccordionGroup>
+  <Accordion title="Using ngrok">
+    <Warning>
+      The paid plan is recommended. The free approval screen and rotating URLs can break the manifest.
+    </Warning>
+
+    1. Start your dev server:
+
+    ```bash Terminal
+    npm run dev
+    ```
+
+    2. Create a tunnel:
+
+    ```bash Terminal
+    npm install -g ngrok
+    ngrok http 3000
+    ```
+
+    3. Copy the HTTPS URL (e.g. `https://your-tunnel.ngrok.io`)
+    4. Use that URL during manifest creation
+  </Accordion>
+</AccordionGroup>
+
+# Create Manifest
+
+> Generate your Farcaster account association and expose the /.well-known/farcaster.json endpoint
+
+With a stable URL, create and configure your manifest so users can save and discover your Mini App.
+
+## Generate account association via CLI
+
+```bash Terminal
+npx create-onchain --manifest
+```
+
+<Info>
+  Use your Farcaster custody wallet to sign. You can import it using your recovery phrase from Farcaster (Settings → Advanced).
+</Info>
+
+After signing, the CLI updates local `.env` variables:
+
+* FARCASTER\_HEADER
+* FARCASTER\_PAYLOAD
+* FARCASTER\_SIGNATURE
+
+Review the full [Manifest guide](/mini-apps/features/manifest) and update all fields. Be sure to update your deployment environment with these values.
+
+<Warning>
+  While testing, set `noindex: true` in your manifest to avoid indexing.
+</Warning>
+
+## `/.well-known/farcaster.json`
+
+The manifest exists in `app/.well-known/farcaster.json/route.ts` which returns your accountAssociation and mini app properties. Ensure all asset URLs are HTTPS and publicly accessible.
+
+<Check>
+  Open `https://yourdomain.com/.well-known/farcaster.json` in a browser to verify JSON output.
+</Check>
+
+## Add frame metadata for embeds
+
+Define `fc:frame` metadata so your app renders a rich embed with a launch button when shared.
+
+Review the full [Embeds and Previews](/mini-apps/features/embeds-and-previews) guide to create engaging sharing experiences and improve discoverability.
+
+<Warning>
+  All image and API URLs must be publicly accessible via HTTPS.
+</Warning>
+
+# Feature Tour
+
+> What the MiniKit includes out of the box and where to extend it
+
+The MiniKit template provides you with key features to get started quickly, which we highlight below. There are additional features which you can find in the [MiniKit technical reference](/mini-apps/technical-reference/minikit/overview).
+
+### Providers
+
+The MiniKitProvider wraps your app and provides MiniKit context to all child components. It configures wagmi, react-query, and the Farcaster connector automatically.
+
+```tsx providers/Providers.tsx
+// MiniKitProvider configuration
+<MiniKitProvider
+  apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+  chain={base}
+  config={{
+    appearance: {
+      mode: 'auto',
+      theme: 'snake',
+      name: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME,
+      logo: process.env.NEXT_PUBLIC_ICON_URL,
+    },
+  }}
+>
+  {children}
+</MiniKitProvider>
+```
+
+### Mini App initialization
+
+When a user first opens your mini app, the MiniKitProvider will initialize the mini app context. This is done by calling the `useMiniKit` hook.
+
+`context` provides you with details about the user and the client (e.g. Base app).
+
+```tsx app/App.tsx
+// Frame initialization
+const { setFrameReady, isFrameReady, context } = useMiniKit();
+
+useEffect(() => {
+  if (!isFrameReady) {
+    setFrameReady();
+  }
+}, [setFrameReady, isFrameReady]);
+
+```
+
+### External Links and Navigation
+
+To leverage the native browser of the Base app, you can use the `useOpenUrl` hook.
+
+Do not use raw links as it can cause breaks or force the user to leave the app.
+
+```tsx components/ExternalLink.tsx
+const openUrl = useOpenUrl();
+
+const handleExternalLink = () => {
+  openUrl('https://example.com');
+};
+```
+
+### Close Mini App
+
+Allows you to add native functionality to close the mini app.
+
+```tsx components/CloseButton.tsx
+const close = useClose();
+
+const handleClose = () => {
+  close();
+};
+```
+
+## Next steps
+
+Add features based on your goals. Start here:
+
+<CardGroup cols={2}>
+  <Card title="Launch Checklist" icon="rocket" href="/mini-apps/quickstart/launch-guide">
+    To get the most out of mini apps, follow the launch checklist.
+  </Card>
+
+  <Card title="Mini App Features" icon="puzzle-piece" href="/mini-apps/features/overview">
+    Comprehensive guides on all mini app features.
+  </Card>
+</CardGroup>

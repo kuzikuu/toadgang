@@ -7,16 +7,6 @@
   "baseBuilder": {
     "allowedAddresses": []
   },
-  "frame": {
-    "name": "Purple Pond",
-    "iconUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
-    "homeUrl": "https://kuzikuu.github.io/toadgang",
-    "imageUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
-    "buttonTitle": "Launch App",
-    "description": "Interactive lily pad interface for Toad Gang Zora community members",
-    "primaryCategory": "social",
-    "tags": ["zora", "toadgang", "community", "nft"]
-  },
   "app": {
     "name": "Purple Pond",
     "iconUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
