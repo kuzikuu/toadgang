@@ -16,5 +16,15 @@
     "description": "Interactive lily pad interface for Toad Gang Zora community members",
     "primaryCategory": "social",
     "tags": ["zora", "toadgang", "community", "nft"]
+  },
+  "app": {
+    "name": "Purple Pond",
+    "iconUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
+    "homeUrl": "https://kuzikuu.github.io/toadgang",
+    "splashImageUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
+    "splashBackgroundColor": "#581c87",
+    "description": "Interactive lily pad interface for Toad Gang Zora community members",
+    "primaryCategory": "social",
+    "tags": ["zora", "toadgang", "community", "nft"]
   }
 }
