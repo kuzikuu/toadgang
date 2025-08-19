@@ -118,9 +118,13 @@ function generateLayout(count, w, h, seed = 42) {
     return [];
   }
   
+  // Use full viewport width for lily pad positioning
+  const fullWidth = window.innerWidth || w;
+  const fullHeight = h;
+  
   // Calculate optimal lily pad sizes based on screen size
-  const minSize = w < 480 ? 50 : w < 640 ? 60 : w < 768 ? 70 : w < 1024 ? 80 : 90;
-  const maxSize = w < 480 ? 80 : w < 640 ? 90 : w < 768 ? 100 : w < 1024 ? 110 : 120;
+  const minSize = fullWidth < 480 ? 50 : fullWidth < 640 ? 60 : fullWidth < 768 ? 70 : fullWidth < 1024 ? 80 : 90;
+  const maxSize = fullWidth < 480 ? 80 : fullWidth < 640 ? 90 : fullWidth < 768 ? 100 : fullWidth < 1024 ? 110 : 120;
   
   const items = [];
   
@@ -133,10 +137,10 @@ function generateLayout(count, w, h, seed = 42) {
     const maxAttempts = 100;
     
     do {
-      // Generate random position within bounds
+      // Generate random position across full viewport width
       const padding = 20;
-      const maxX = w - size - padding;
-      const maxY = h - size - padding;
+      const maxX = fullWidth - size - padding;
+      const maxY = fullHeight - size - padding;
       
       x = padding + Math.floor(rand() * maxX);
       y = padding + Math.floor(rand() * maxY);
@@ -165,8 +169,8 @@ function generateLayout(count, w, h, seed = 42) {
     
     // If we couldn't find a good position, use the last generated one
     // but ensure it's within bounds
-    x = Math.max(20, Math.min(w - size - 20, x));
-    y = Math.max(20, Math.min(h - size - 20, y));
+    x = Math.max(20, Math.min(fullWidth - size - 20, x));
+    y = Math.max(20, Math.min(fullHeight - size - 20, y));
     
     // random drift speeds (CSS animation durations)
     const drift = 7 + rand() * 10; // seconds
@@ -252,9 +256,11 @@ export default function PurplePondSpheres() {
   }, [query]);
 
   const layout = useMemo(() => {
-    // If container size is not ready, generate a fallback layout
+    // If container size is not ready, generate a fallback layout using full viewport
     if (w <= 0 || h <= 0) {
-      return generateLayout(filtered.length, 800, 600, seed); // Use reasonable defaults
+      const viewportWidth = window.innerWidth || 1200;
+      const viewportHeight = window.innerHeight || 800;
+      return generateLayout(filtered.length, viewportWidth, viewportHeight, seed);
     }
     
     return generateLayout(filtered.length, w, h, seed);
