@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for mobile optimization */
+@media (max-width: 768px) {
+  .mobile-optimized {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+}
+
+/* Prevent text flashing on mobile */
+.text-no-flash {
+  will-change: auto;
+  backface-visibility: visible;
+  transform: translateZ(0);
+}
+
+/* Smooth animations */
+.smooth-animation {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Lily pad hover effects */
+.lily-pad-hover {
+  transition: transform 0.2s ease-in-out;
+}
+
+.lily-pad-hover:hover {
+  transform: scale(1.05);
+}
+
+/* Background image optimization */
+.bg-cover-optimized {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

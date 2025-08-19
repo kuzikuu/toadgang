@@ -1,36 +1,42 @@
 {
   "name": "toadgang-purple-pond",
   "version": "1.0.0",
-  "type": "module",
-  "description": "Purple Pond: Lily Pad Links for Toadgang Zora community",
-  "main": "index.js",
+  "description": "Interactive lily pad interface for Toad Gang Zora community members",
   "scripts": {
-    "start": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "deploy": "npm run build && gh-pages -d dist"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "deploy": "next build && next export && touch out/.nojekyll"
   },
   "dependencies": {
-    "@coinbase/onchainkit": "^0.38.19",
-    "lucide-react": "^0.263.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "wagmi": "^2.16.3"
+    "lucide-react": "^0.263.1",
+    "@coinbase/onchainkit": "^0.38.19",
+    "wagmi": "^1.4.7",
+    "next": "^13.5.6"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.0",
-    "autoprefixer": "^10.4.14",
-    "gh-pages": "^6.1.0",
-    "postcss": "^8.4.24",
-    "tailwindcss": "^3.3.2",
-    "vite": "^4.4.0"
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0",
+    "tailwindcss": "^3.3.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^13.5.6"
   },
   "keywords": [
-    "react",
     "zora",
     "toadgang",
-    "purple-pond"
+    "community",
+    "nft",
+    "web3",
+    "interactive",
+    "lily-pads"
   ],
-  "author": "Toadgang",
+  "author": "Toad Gang",
   "license": "MIT"
 }

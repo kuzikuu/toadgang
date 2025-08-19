@@ -4,26 +4,11 @@
     "payload": "eyJkb21haW4iOiJrdXppa3V1LmdpdGh1Yi5pbyJ9",
     "signature": "MHg1MGJkNTFiMDNmZGRkMjFkYjYyNzdlNzI3YjRkNjNlN2JhMTkzOTdjMDE2NDE2MGQwNGQ0ZWQxZWE4Y2M0YmExMTM4ODY2YWY2Y2VjMGJiM2ZkNGQwMjZjMTRhZjNkNDNjOTg1ODE1ZjRiNmYwNDgyYmEwY2RmYzZjNWY0YTQxMTFj"
   },
-
   "frame": {
     "version": "1",
     "name": "Purple Pond",
     "subtitle": "Toad Gang Zora Community",
     "description": "Interactive lily pad interface for Toad Gang Zora community members",
-    "iconUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
-    "splashImageUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
-    "splashBackgroundColor": "#581c87",
-    "homeUrl": "https://kuzikuu.github.io/toadgang",
-    "webhookUrl": "https://kuzikuu.github.io/toadgang",
-    "primaryCategory": "social",
-    "tags": ["zora", "toadgang", "community", "toby", "web3", "social", "interactive", "lily-pads"]
-  },
-
-  "app": {
-    "version": "1",
-    "name": "Purple Pond",
-    "subtitle": "Toad Gang Zora Community",
-    "description": "Interactive lily pad interface for Toad Gang Zora community members. Discover and connect with NFT creators through an engaging, animated pond experience.",
     "screenshotUrls": [],
     "iconUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
     "splashImageUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
@@ -31,7 +16,6 @@
     "homeUrl": "https://kuzikuu.github.io/toadgang",
     "webhookUrl": "https://kuzikuu.github.io/toadgang",
     "primaryCategory": "social",
-    "secondaryCategory": "community",
     "tags": ["zora", "toadgang", "community", "toby", "web3", "social", "interactive", "lily-pads"],
     "heroImageUrl": "https://kuzikuu.github.io/toadgang/purplepond.png",
     "tagline": "Discover Toad Gang through interactive lily pads",

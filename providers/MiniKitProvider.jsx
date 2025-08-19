@@ -5,14 +5,14 @@ import { base } from 'wagmi/chains';
 export function MiniKitContextProvider({ children }) {
   return (
     <MiniKitProvider 
-      apiKey={import.meta.env.VITE_ONCHAINKIT_API_KEY} 
+      apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY || 'your_api_key_here'} 
       chain={base}
       config={{
         appearance: {
           mode: 'auto',
           theme: 'snake', 
-          name: import.meta.env.VITE_ONCHAINKIT_PROJECT_NAME || 'Purple Pond',
-          logo: import.meta.env.VITE_APP_ICON || 'https://kuzikuu.github.io/toadgang/lily.png',
+          name: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME || 'Purple Pond',
+          logo: process.env.NEXT_PUBLIC_APP_ICON || 'https://kuzikuu.github.io/toadgang/purplepond.png',
         },
       }}
     >
