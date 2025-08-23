@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { MiniKitContextProvider } from '@/providers/MiniKitProvider';
+import { MiniKitContextProvider } from '../providers/MiniKitProvider';
+import ErudaDebugger from '../components/ErudaDebugger';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -52,6 +53,7 @@ export default function RootLayout({
         <MiniKitContextProvider>
           {children}
         </MiniKitContextProvider>
+        <ErudaDebugger />
       </body>
     </html>
   );
