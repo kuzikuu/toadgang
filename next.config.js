@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
+  trailingSlash: true,
   images: {
-    domains: ['kuzikuu.github.io'],
+    unoptimized: true,
+    domains: ['kuzikuu.github.io', 'www.toadgang.art'],
   },
   async headers() {
     return [

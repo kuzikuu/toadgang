@@ -1,0 +1,20 @@
+{
+  "accountAssociation": {
+    "header": "your-farcaster-header",
+    "payload": "your-farcaster-payload", 
+    "signature": "your-farcaster-signature"
+  },
+  "baseBuilder": {
+    "allowedAddresses": ["0x..."]
+  },
+  "frame": {
+    "name": "ToadGang Mini App",
+    "iconUrl": "https://www.toadgang.art/generated-icon.png",
+    "homeUrl": "https://www.toadgang.art",
+    "imageUrl": "https://www.toadgang.art/purplepond.png",
+    "buttonTitle": "Launch Purple Pond", 
+    "description": "Interactive lily pad interface for Toad Gang Zora community members",
+    "primaryCategory": "social",
+    "tags": ["art", "creative", "community", "zora"]
+  }
+}
