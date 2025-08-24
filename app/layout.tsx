@@ -7,7 +7,7 @@ import ErudaDebugger from '../components/ErudaDebugger';
 const inter = Inter({ subsets: ['latin'] });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const URL = process.env.NEXT_PUBLIC_URL || 'https://kuzikuu.github.io/toadgang';
+  const URL = process.env.NEXT_PUBLIC_URL || 'https://www.toadgang.art';
   return {
     title: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME || 'Purple Pond',
     description: 'Interactive lily pad interface for Toad Gang Zora community members',
@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: 'Purple Pond',
       images: [
         {
-          url: 'https://kuzikuu.github.io/toadgang/purplepond.png',
+          url: 'https://www.toadgang.art/purplepond.png',
           width: 1200,
           height: 630,
           alt: 'Purple Pond - Toad Gang Zora Community',
@@ -31,11 +31,11 @@ export async function generateMetadata(): Promise<Metadata> {
       card: 'summary_large_image',
       title: 'Purple Pond - Toad Gang Zora Community',
       description: 'Interactive lily pad interface for Toad Gang Zora community members',
-      images: ['https://kuzikuu.github.io/toadgang/purplepond.png'],
+      images: ['https://www.toadgang.art/purplepond.png'],
     },
     other: {
       'fc:frame': 'vNext',
-      'fc:frame:image': 'https://kuzikuu.github.io/toadgang/purplepond.png',
+      'fc:frame:image': 'https://www.toadgang.art/purplepond.png',
       'fc:frame:button:1': 'Launch Purple Pond',
       'fc:frame:post_url': URL,
     },
@@ -49,6 +49,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* Farcaster Frame Meta Tags */}
+        <meta name="fc:frame" content="vNext" />
+        <meta name="fc:frame:image" content="https://www.toadgang.art/purplepond.png" />
+        <meta name="fc:frame:button:1" content="Launch Purple Pond" />
+        <meta name="fc:frame:post_url" content="https://www.toadgang.art" />
+      </head>
       <body className={inter.className}>
         <MiniKitContextProvider>
           {children}
