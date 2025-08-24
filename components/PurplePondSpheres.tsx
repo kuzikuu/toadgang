@@ -236,8 +236,45 @@ export default function PurplePondSpheres() {
   useEffect(() => {
     if (!isFrameReady && setFrameReady) {
       setFrameReady();
+      console.log('✅ Frame marked as ready');
     }
   }, [setFrameReady, isFrameReady]);
+
+  // Debug logging for embed issues
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.log('🔍 Purple Pond Debug Info:');
+      console.log('Current URL:', window.location.href);
+      console.log('User Agent:', navigator.userAgent);
+      console.log('Viewport:', window.innerWidth, 'x', window.innerHeight);
+      console.log('Is Mobile:', isMobile);
+      
+      // Test if images are loading
+      const testImage = new Image();
+      testImage.onload = () => console.log('✅ Purple pond image loaded successfully');
+      testImage.onerror = () => console.log('❌ Purple pond image failed to load');
+      testImage.src = '/purplepond.png';
+      
+      // Test manifest accessibility
+      fetch('/.well-known/farcaster.json')
+        .then(response => {
+          if (response.ok) {
+            console.log('✅ Farcaster manifest accessible');
+            return response.json();
+          } else {
+            console.log('❌ Farcaster manifest not accessible:', response.status);
+          }
+        })
+        .then(data => {
+          if (data) {
+            console.log('📄 Manifest data:', data);
+          }
+        })
+        .catch(error => {
+          console.log('❌ Error fetching manifest:', error);
+        });
+    }
+  }, [isMobile]);
 
   // Preload the splash image for better UX
   useEffect(() => {
