@@ -38,5 +38,12 @@
   background-repeat: no-repeat;
 }
 
+/* Lily pad text styling */
+.lily-pad-text {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
 
 

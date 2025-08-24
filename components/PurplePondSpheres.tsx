@@ -247,6 +247,7 @@ export default function PurplePondSpheres() {
     };
     lilyImage.onerror = () => {
       // If image fails to load, still mark as loaded to show the app
+      console.warn('Lily image failed to load, continuing anyway');
       setIsImageLoaded(true);
     };
     lilyImage.src = '/lily.png';
@@ -270,17 +271,30 @@ export default function PurplePondSpheres() {
   }, [query]);
 
   const layout = useMemo(() => {
-    // If container size is not ready, generate a fallback layout using full viewport
-    if (w <= 0 || h <= 0) {
-      const viewportWidth = typeof window !== 'undefined' ? window.innerWidth || 1200 : 1200;
-      const viewportHeight = typeof window !== 'undefined' ? window.innerHeight || 800 : 800;
+    try {
+      // If container size is not ready, generate a fallback layout using full viewport
+      if (w <= 0 || h <= 0) {
+        const viewportWidth = typeof window !== 'undefined' ? window.innerWidth || 1200 : 1200;
+        const viewportHeight = typeof window !== 'undefined' ? window.innerHeight || 800 : 800;
+        return generateLayout(filtered.length, viewportWidth, viewportHeight, seed);
+      }
+      
+      // Use full viewport dimensions for better coverage
+      const viewportWidth = typeof window !== 'undefined' ? window.innerWidth || w : w;
+      const viewportHeight = typeof window !== 'undefined' ? window.innerHeight || h : h;
       return generateLayout(filtered.length, viewportWidth, viewportHeight, seed);
+    } catch (error) {
+      console.error('Error generating layout:', error);
+      // Fallback to a simple grid layout
+      return Array.from({ length: filtered.length }, (_, i) => ({
+        x: (i % 5) * 120 + 50,
+        y: Math.floor(i / 5) * 120 + 50,
+        size: 100,
+        drift: 8,
+        float: 6,
+        angle: 0
+      }));
     }
-    
-         // Use full viewport dimensions for better coverage
-     const viewportWidth = typeof window !== 'undefined' ? window.innerWidth || w : w;
-     const viewportHeight = typeof window !== 'undefined' ? window.innerHeight || h : h;
-     return generateLayout(filtered.length, viewportWidth, viewportHeight, seed);
   }, [filtered.length, w, h, seed]);
 
   const handleRegistrationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -324,7 +338,7 @@ export default function PurplePondSpheres() {
     // Use Mini App composeCast for Farcaster integration
     composeCast({
       text: 'Check out Purple Pond - the interactive lily pad interface for Toad Gang Zora community members! 🐸🍃',
-      embeds: ['https://kuzikuu.github.io/toadgang'],
+      embeds: ['https://www.toadgang.art'],
     });
   };
 
@@ -486,7 +500,17 @@ export default function PurplePondSpheres() {
                   alt="lily pad"
                   draggable={false}
                   className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.45)] transition-transform group-active:scale-95"
+                  onError={(e) => {
+                    console.warn(`Failed to load lily pad image for ${item.name}`);
+                    // Fallback to a colored div if image fails
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  }}
                 />
+                {/* Fallback colored div if image fails */}
+                <div className="hidden w-full h-full bg-green-500/80 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">🍃</span>
+                </div>
                 {/* Handle label - Mobile optimized */}
                 <span className="lily-pad-text absolute left-1/2 -translate-x-1/2 bottom-1 translate-y-1/2 whitespace-nowrap text-[8px] xs:text-[10px] sm:text-xs md:text-sm font-semibold bg-black/55 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ring-1 ring-white/20 backdrop-blur max-w-[90%] truncate">
                   🍃 {item.name}
