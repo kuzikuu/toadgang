@@ -4,7 +4,7 @@ const nextConfig = {
   trailingSlash: true,
   images: {
     unoptimized: true,
-    domains: ['kuzikuu.github.io', 'www.toadgang.art'],
+    domains: ['www.toadgang.art'],
   },
 };
 
