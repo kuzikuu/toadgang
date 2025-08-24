@@ -276,6 +276,71 @@ export default function PurplePondSpheres() {
     }
   }, [isMobile]);
 
+  // Add visible debug button for all devices
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Remove existing debug button if any
+      const existingButton = document.getElementById('debug-button');
+      if (existingButton) {
+        existingButton.remove();
+      }
+
+      // Create a visible debug button
+      const debugButton = document.createElement('button');
+      debugButton.id = 'debug-button';
+      debugButton.innerHTML = '🐛 Debug';
+      debugButton.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        background: #ff6b6b;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        font-weight: bold;
+      `;
+      
+      debugButton.onclick = () => {
+        // Show debug info in an alert
+        const debugInfo = `
+🔍 Purple Pond Debug Info:
+URL: ${window.location.href}
+Mobile: ${isMobile}
+Viewport: ${window.innerWidth} x ${window.innerHeight}
+User Agent: ${navigator.userAgent.substring(0, 100)}...
+
+Check browser console for detailed logs!
+        `;
+        alert(debugInfo);
+        
+        // Also log to console
+        console.log('🐛 Debug button clicked!');
+        console.log('🔍 Full debug info:', {
+          url: window.location.href,
+          mobile: isMobile,
+          viewport: { width: window.innerWidth, height: window.innerHeight },
+          userAgent: navigator.userAgent
+        });
+      };
+      
+      document.body.appendChild(debugButton);
+      console.log('✅ Debug button added');
+      
+      // Cleanup on unmount
+      return () => {
+        const button = document.getElementById('debug-button');
+        if (button) {
+          button.remove();
+        }
+      };
+    }
+  }, [isMobile]);
+
   // Preload the splash image for better UX
   useEffect(() => {
     const lilyImage = new Image();
