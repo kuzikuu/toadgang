@@ -33,7 +33,14 @@ export async function generateMetadata(): Promise<Metadata> {
       description: 'Interactive lily pad interface for Toad Gang Zora community members',
       images: ['https://www.toadgang.art/purplepond.png'],
     },
-
+    other: {
+      'fc:frame': 'vNext',
+      'fc:frame:image': 'https://www.toadgang.art/purplepond.png',
+      'fc:frame:button:1': 'Launch Purple Pond',
+      'fc:frame:post_url': URL,
+      'fc:frame:input:text': 'false',
+      'fc:frame:state': '{}',
+    },
   };
 }
 
@@ -44,13 +51,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        {/* Farcaster Frame Meta Tags */}
-        <meta name="fc:frame" content="vNext" />
-        <meta name="fc:frame:image" content="https://www.toadgang.art/purplepond.png" />
-        <meta name="fc:frame:button:1" content="Launch Purple Pond" />
-        <meta name="fc:frame:post_url" content="https://www.toadgang.art" />
-      </head>
       <body className={inter.className}>
         <MiniKitContextProvider>
           {children}
