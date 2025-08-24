@@ -1,11 +1,11 @@
 {
   "accountAssociation": {
-    "header": "your-farcaster-header",
-    "payload": "your-farcaster-payload", 
-    "signature": "your-farcaster-signature"
+    "header": "eyJmaWQiOjMxMTE0MSwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDM4Q0U0OTMxMjQwMmExRmIzNjkxMkRGNWY1Njk4MUZEMjIxRGU4MkEifQ",
+    "payload": "eyJkb21haW4iOiJ3d3cudG9hZGdhbmcuYXJ0In0=",
+    "signature": "MHg1MGJkNTFiMDNmZGRkMjFkYjYyNzdlNzI3YjRkNjNlN2JhMTkzOTdjMDE2NDE2MGQwNGQ0ZWQxZWE4Y2M0YmExMTM4ODY2YWY2Y2VjMGJiM2ZkNGQwMjZjMTRhZjNkNDNjOTg1ODE1ZjRiNmYwNDgyYmEwY2RmYzZjNWY0YTQxMTFj"
   },
   "baseBuilder": {
-    "allowedAddresses": ["0x..."]
+    "allowedAddresses": ["0x38CE49312402a1Fb36912DF5f56981FD221De82A"]
   },
   "frame": {
     "name": "ToadGang Mini App",
