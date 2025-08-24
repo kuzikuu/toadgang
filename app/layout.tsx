@@ -33,7 +33,12 @@ export async function generateMetadata(): Promise<Metadata> {
       description: 'Interactive lily pad interface for Toad Gang Zora community members',
       images: ['https://www.toadgang.art/purplepond.png'],
     },
-
+    other: {
+      'fc:frame': 'vNext',
+      'fc:frame:image': 'https://www.toadgang.art/purplepond.png',
+      'fc:frame:button:1': 'Launch Purple Pond',
+      'fc:frame:post_url': 'https://www.toadgang.art',
+    },
   };
 }
 
