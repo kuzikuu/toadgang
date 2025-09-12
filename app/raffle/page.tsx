@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 export default function RafflePage() {
   useEffect(() => {
     // Redirect to the external raffle bot
-    window.location.href = 'https://161.153.9.61:3001/';
+    window.location.href = 'https://raffle.toadgang.art/';
   }, []);
 
   return (
@@ -17,7 +17,7 @@ export default function RafflePage() {
         <p className="text-sm text-fuchsia-300 mt-4">
           If you're not redirected automatically,{' '}
           <a 
-            href="https://161.153.9.61:3001/" 
+            href="https://raffle.toadgang.art/" 
             className="underline hover:text-fuchsia-100"
             target="_blank"
             rel="noopener noreferrer"
