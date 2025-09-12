@@ -665,7 +665,7 @@ Check browser console for detailed logs!
             }}
             className="flex-1 py-3 sm:py-2 px-4 rounded-2xl bg-fuchsia-600/90 hover:bg-fuchsia-500 active:bg-fuchsia-700 transition-all duration-200 shadow-lg shadow-fuchsia-900/40 touch-manipulation text-white font-medium text-sm sm:text-base"
           >
-            🐸 PurplePond
+            🐸 PurplePond (Updated)
           </button>
           <button
             onClick={() => {
