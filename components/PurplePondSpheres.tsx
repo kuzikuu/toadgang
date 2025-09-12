@@ -651,11 +651,28 @@ Check browser console for detailed logs!
         </div>
       </main>
 
-      {/* Footer blurb - Mobile optimized */}
-      <footer className="relative z-10 mx-auto max-w-6xl px-3 sm:px-4 pb-4 sm:pb-6 md:pb-8 text-xs sm:text-sm text-fuchsia-50/90 drop-shadow">
-        <p className="leading-relaxed">
-          Arigato <a href="https://x.com/TopNoshFinance" className="underline decoration-fuchsia-300/70 hover:decoration-fuchsia-200" target="_blank" rel="noreferrer noopener">Topnoshfinance </a> for building the list. Built for <a href="https://github.com/kuzikuu/toadgang" className="underline decoration-fuchsia-300/70 hover:decoration-fuchsia-200" target="_blank" rel="noreferrer noopener">toadgang</a>. Study the lore <a href="https://toadgod.xyz" className="underline decoration-fuchsia-300/70 hover:decoration-fuchsia-200" target="_blank" rel="noreferrer noopener">toadgod.xyz</a>.
-        </p>
+      {/* Tab Navigation - Mobile optimized */}
+      <footer className="relative z-10 mx-auto max-w-6xl px-3 sm:px-4 pb-4 sm:pb-6 md:pb-8">
+        <div className="flex gap-2 sm:gap-3">
+          <button
+            onClick={() => {
+              triggerHaptic();
+              window.location.href = 'https://toadgang.art';
+            }}
+            className="flex-1 py-3 sm:py-2 px-4 rounded-2xl bg-fuchsia-600/90 hover:bg-fuchsia-500 active:bg-fuchsia-700 transition-all duration-200 shadow-lg shadow-fuchsia-900/40 touch-manipulation text-white font-medium text-sm sm:text-base"
+          >
+            🐸 PurplePond
+          </button>
+          <button
+            onClick={() => {
+              triggerHaptic();
+              window.location.href = 'https://toadgang.art/raffle';
+            }}
+            className="flex-1 py-3 sm:py-2 px-4 rounded-2xl bg-purple-600/90 hover:bg-purple-500 active:bg-purple-700 transition-all duration-200 shadow-lg shadow-purple-900/40 touch-manipulation text-white font-medium text-sm sm:text-base"
+          >
+            🎲 Raffle Bot
+          </button>
+        </div>
       </footer>
 
       {/* Registration Button */}
