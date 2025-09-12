@@ -655,7 +655,7 @@ Check browser console for detailed logs!
         </div>
       </main>
 
-      {/* Tab Navigation - Mobile optimized */}
+      {/* Tab Navigation - Mobile optimized - Updated */}
       <footer className="relative z-10 mx-auto max-w-6xl px-3 sm:px-4 pb-4 sm:pb-6 md:pb-8">
         <div className="flex gap-2 sm:gap-3">
           <button
