@@ -4,8 +4,19 @@ import { useEffect } from 'react';
 
 export default function RafflePage() {
   useEffect(() => {
-    // Redirect to the external raffle bot
-    window.location.href = 'https://raffle.toadgang.art/';
+    // Try the subdomain first, fallback to IP if needed
+    const raffleUrl = 'https://raffle.toadgang.art/';
+    const fallbackUrl = 'http://161.153.9.61:80/';
+    
+    // Test if subdomain is accessible
+    fetch(raffleUrl, { mode: 'no-cors' })
+      .then(() => {
+        window.location.href = raffleUrl;
+      })
+      .catch(() => {
+        console.log('Subdomain not accessible, using fallback');
+        window.location.href = fallbackUrl;
+      });
   }, []);
 
   return (
@@ -22,7 +33,16 @@ export default function RafflePage() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            click here
+            try subdomain
+          </a>
+          {' '}or{' '}
+          <a 
+            href="http://161.153.9.61:80/" 
+            className="underline hover:text-fuchsia-100"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            direct IP
           </a>
         </p>
       </div>
